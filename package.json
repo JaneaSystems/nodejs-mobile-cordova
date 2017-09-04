@@ -1,0 +1,26 @@
+{
+  "name": "nodejs-mobile-cordova",
+  "version": "0.1.1",
+  "description": "Node.js for Mobile Apps Cordova plugin",
+  "cordova": {
+    "id": "nodejs-mobile-cordova",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "keywords": [
+    "cordova",
+    "mobile",
+    "nodejs",
+    "node.js",
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android"
+  ],
+  "author": "janeasystems",
+  "license": "MIT",
+  "dependencies": {
+    "tar.gz2": "^1.0.0"
+  }
+}
