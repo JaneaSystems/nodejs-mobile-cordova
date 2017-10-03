@@ -16,6 +16,11 @@ cordova plugin add nodejs-mobile-cordova
 - Android (ARMv7a, x86)
 - iOS (ARM64)
 
+## Reporting Issues
+
+We have a [central repo](https://github.com/janeasystems/nodejs-mobile/issues) where we manage all the issues related to Node.js for Mobile Apps, including specific issues of the Node.js for Mobile Cordova plugin.
+So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/issues).
+
 ## Cordova Methods
 
 - `nodejs.start`
