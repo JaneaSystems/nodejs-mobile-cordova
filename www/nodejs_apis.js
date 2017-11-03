@@ -1,4 +1,5 @@
 // Bridge between the Cordova UI and the NodeJS plugin
+'use strict';
 
 class Channel {};
 
