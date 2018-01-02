@@ -8,9 +8,13 @@ import android.util.Log;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 
 import java.io.*;
 import java.lang.System;
+import java.util.*;
 
 public class NodeJS extends CordovaPlugin {
 
@@ -19,10 +23,16 @@ public class NodeJS extends CordovaPlugin {
 
   private static String filesDir;
   private static final String PROJECT_ROOT = "www/nodejs-project";
-  private static final String PROJECT_ASSETS = "nodejs-mobile-cordova-assets";
+  private static final String BUILTIN_ASSETS = "nodejs-mobile-cordova-assets";
   private static final String BUILTIN_MODULES = "nodejs-mobile-cordova-assets/builtin_modules";
+  private static final String TRASH_DIR = "nodejs-project-trash";
   private static String nodeAppRootAbsolutePath = "";
   private static String nodePath = "";
+  private static String trashDir = "";
+
+  private static final String LAST_UPDATED_TIME = "NODEJS_MOBILE_APK_LastUpdateTime";
+  private long lastUpdateTime = 1;
+  private long previousLastUpdateTime = 0;
 
   private static boolean appPaused = false;
   private static String LOGTAG = "NodeJS-Cordova";
@@ -49,15 +59,11 @@ public class NodeJS extends CordovaPlugin {
     NodeJS.filesDir = activity.getBaseContext().getFilesDir().getAbsolutePath();
     NodeJS.nodeAppRootAbsolutePath = filesDir + "/" + NodeJS.PROJECT_ROOT;
     NodeJS.nodePath = filesDir + "/" + NodeJS.BUILTIN_MODULES;
+    NodeJS.trashDir = filesDir + "/" + NodeJS.TRASH_DIR;
 
-    // Copy plugin assets to plugin working folder
-    boolean result = copyFolder(PROJECT_ASSETS);
-    // Copy project files to project working folder
-    result &= copyFolder(PROJECT_ROOT);
-
-    if (result == false) {
-      Log.e(LOGTAG, "FAILED TO COPY ASSETS");
-    }
+    getLastUpdateTimes();
+    copyAssetsIfRequired();
+    emptyTrashAsync();
   }
 
   @Override
@@ -223,6 +229,112 @@ public class NodeJS extends CordovaPlugin {
    * Private assets helpers
    */
 
+  private void getLastUpdateTimes() {
+    SharedPreferences prefs = this.activity.getPreferences(Context.MODE_PRIVATE);
+    this.previousLastUpdateTime = prefs.getLong(LAST_UPDATED_TIME, 0);
+
+    try {
+      PackageInfo packageInfo = this.activity.getPackageManager().getPackageInfo(this.activity.getPackageName(), 0);
+      this.lastUpdateTime = packageInfo.lastUpdateTime;
+    } catch (PackageManager.NameNotFoundException e) {
+      Log.e(LOGTAG, e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  private void emptyTrashSync() {
+    File trash = new File(NodeJS.trashDir);
+    if (trash.exists()) {
+      Log.v(LOGTAG, "Deleting the trash folder (sync)");
+      deleteFolderRecursively(trash);
+    }
+  }
+
+  private void emptyTrashAsync() {
+    File trash = new File(NodeJS.trashDir);
+    if (trash.exists()) {
+      new Thread(new Runnable() {
+        public void run() {
+          Log.v(LOGTAG, "Deleting the trash folder (async)");
+          File trash = new File(NodeJS.trashDir);
+          deleteFolderRecursively(trash);
+        }
+      }).start();
+    }
+  }
+
+  private void copyAssetsIfRequired() {
+    // The first time the app is executed and everytime the app is updated,
+    // the nodejs-mobile assets are copied from the APK to a working folder.
+    if (this.lastUpdateTime != this.previousLastUpdateTime) {
+      // In case a previous startup went wrong, make sure the trash is cleaned up
+      emptyTrashSync();
+
+      File folderObject = new File(NodeJS.filesDir + "/" + PROJECT_ROOT);
+      if (folderObject.exists()) {
+        Log.v(LOGTAG, "Moving existing project folder to trash");
+        File trash = new File(NodeJS.trashDir);
+        folderObject.renameTo(trash);
+      }
+
+      // Delete the existing plugin assets in the working folder and copy them again from the APK
+      folderObject = new File(NodeJS.filesDir + "/" + BUILTIN_ASSETS);
+      deleteFolderRecursively(folderObject);
+      boolean result = copyFolder(BUILTIN_ASSETS);
+
+      // Load the nodejs project's folder and files lists
+      ArrayList<String> dirs = readFileFromAssets("dir.list");
+      ArrayList<String> files = readFileFromAssets("file.list");
+      // Copy project files to project working folder
+      if (dirs.size() > 0 && files.size() > 0) {
+        Log.v(LOGTAG, "Building folder hierarchy");
+        for (String dir : dirs) {
+          new File(NodeJS.filesDir + "/" + dir).mkdirs();
+        }
+
+        Log.v(LOGTAG, "Copying assets using file list");
+        for (String file : files) {
+          String src = file;
+          String dest = NodeJS.filesDir + "/" + file;
+          NodeJS.copyAssetFile(src, dest);
+        }
+      } else {
+        Log.v(LOGTAG, "Copying assets enumerating the APK assets folder");
+        result &= copyFolder(PROJECT_ROOT);
+      }
+
+      if (result == false) {
+        Log.e(LOGTAG, "Failed to copy assets");
+      } else {
+        Log.v(LOGTAG, "Assets copied");
+        // Persist the APK last update time
+        SharedPreferences prefs = this.activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong(LAST_UPDATED_TIME, this.lastUpdateTime);
+        editor.commit();
+      }
+    }
+  }
+
+  private ArrayList<String> readFileFromAssets(String filename){
+    ArrayList lines = new ArrayList();
+    final Context context = this.activity.getBaseContext();
+    try {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
+      String line = reader.readLine();
+      while (line != null) {
+        lines.add(line);
+        line = reader.readLine();
+      }
+      reader.close();
+    } catch (IOException e) {
+      Log.e(LOGTAG, e.getMessage());
+      lines = new ArrayList();
+    }
+
+    return lines;
+  }
+
   private static boolean copyFolder(String srcFolder) {
     boolean result = true;
     String destFolder = NodeJS.filesDir + "/" + srcFolder;
@@ -301,5 +413,4 @@ public class NodeJS extends CordovaPlugin {
       return false;
     }
   }
-
 }

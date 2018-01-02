@@ -22,7 +22,7 @@
   <platform name="ios">
 
     <hook type="before_plugin_install" src="install/hooks/ios/before-plugin-install.js" />
-    
+
     <config-file target="config.xml" parent="/*">
       <feature name="NodeJS">
         <param name="ios-package" value="CDVNodeJS" />
@@ -49,6 +49,7 @@
   <platform name="android">
 
     <hook type="before_plugin_install" src="install/hooks/android/before-plugin-install.js" />
+    <hook type="before_build" src="install/hooks/android/before-build.js" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="NodeJS">
