@@ -37,7 +37,7 @@ android {
     
     sourceSets {
         main {
-            jniLibs.srcDirs '../../libs/libnode/android/'
+            jniLibs.srcDirs '../../libs/android/libnode/bin/'
         }
     }
     

@@ -36,12 +36,12 @@
     <source-file src="src/ios/NativeModule.cpp" />
     <header-file src="src/ios/NodeJSRunner.hh" />
     <source-file src="src/ios/NodeJSRunner.mm" />
-    <header-file src="libs/libnode/include/node" />
+    <header-file src="libs/ios/nodemobile/include/node" />
 
     <asset src="install/nodejs-mobile-cordova-assets" target="nodejs-mobile-cordova-assets" />
 
-    <framework src="libs/libnode/ios/libnode.framework" custom="true" embed="true" />
-    <framework src="libs/libnode/ios/libnode.framework" />
+    <framework src="libs/ios/nodemobile/NodeMobile.framework" custom="true" embed="true" />
+    <framework src="libs/ios/nodemobile/NodeMobile.framework" />
 
   </platform>
 
@@ -69,16 +69,16 @@
     <source-file src="src/android/jni/cordova-bridge.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
     <source-file src="src/android/jni/native-module.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
 
-    <source-file src="libs/libnode/include/node/" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="libs/android/libnode/include/node/" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
 
     <source-file src="install/nodejs-mobile-cordova-assets/" target-dir="assets/" />
 
-    <source-file src="libs/libnode/android/armeabi-v7a" target-dir="libs/"/>
-    <source-file src="libs/libnode/android/x86" target-dir="libs/"/>
+    <source-file src="libs/android/libnode/bin/armeabi-v7a" target-dir="libs/"/>
+    <source-file src="libs/android/libnode/bin/x86" target-dir="libs/"/>
 
     <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
     <source-file src="src/android/CMakeLists.txt" target-dir="."/>
 
   </platform>
 
-</plugin>      
+</plugin>

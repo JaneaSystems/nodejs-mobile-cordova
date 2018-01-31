@@ -22,7 +22,7 @@ add_library( # Sets the name of the library.
            )
 
 include_directories(libs/)
-include_directories(libs/libnode/include/node/)
+include_directories(libs/android/libnode/include/node/)
 include_directories(src/com/janeasystems/cdvnodejsmobile/jni/)
 
 add_library( libnode

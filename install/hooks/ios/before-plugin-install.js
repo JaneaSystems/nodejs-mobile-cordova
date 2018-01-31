@@ -2,11 +2,11 @@ var fs = require('fs');
 var targz2 = require('tar.gz2');
 
 const nodeProjectFolder = 'www/nodejs-project';
-const libnodeFolderPath = 'plugins/nodejs-mobile-cordova/libs/libnode/ios/';
-const libnodeFileName = 'libnode.framework';
-const libnodeFilePath = libnodeFolderPath + libnodeFileName;
-const zipFileName = libnodeFileName + '.tar.zip';
-const zipFilePath = libnodeFolderPath + zipFileName
+const nodeMobileFolderPath = 'plugins/nodejs-mobile-cordova/libs/ios/nodemobile/';
+const nodeMobileFileName = 'NodeMobile.framework';
+const nodeMobileFilePath = nodeMobileFolderPath + nodeMobileFileName;
+const zipFileName = nodeMobileFileName + '.tar.zip';
+const zipFilePath = nodeMobileFolderPath + zipFileName
 
 module.exports = function(context) {
   var Q = context.requireCordovaModule('q');
@@ -19,7 +19,7 @@ module.exports = function(context) {
 
   // Unzip and untar the libnode.Framework
   if (fs.existsSync(zipFilePath)) {  
-    targz2().extract(zipFilePath, libnodeFolderPath, function(err) {
+    targz2().extract(zipFilePath, nodeMobileFolderPath, function(err) {
       if (err) {
         deferral.reject(err);
       } else {
@@ -27,8 +27,8 @@ module.exports = function(context) {
         deferral.resolve();
       }
     });
-  } else if (!fs.existsSync(libnodeFilePath)) {
-    deferral.reject(new Error(libnodeFileName + ' is missing'));
+  } else if (!fs.existsSync(nodeMobileFilePath)) {
+    deferral.reject(new Error(nodeMobileFileName + ' is missing'));
   } else {
     deferral.resolve();
   }

@@ -1,5 +1,5 @@
 #import "NodeJSRunner.hh"
-#import <libnode/node.hpp>
+#import <NodeMobile/NodeMobile.h>
 
 @implementation NodeJSRunner: NSObject
 
@@ -65,7 +65,7 @@ static NSArray* _arguments = nil;
   }
   
   // Start node, with argc and argv.
-  node::Start(argument_count, argv);
+  node_start(argument_count, argv);
 }
 
 @end

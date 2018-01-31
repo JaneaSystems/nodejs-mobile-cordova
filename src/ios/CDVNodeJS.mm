@@ -1,7 +1,7 @@
 #import <Cordova/CDV.h>
 #import "CDVNodeJS.hh"
 #import "NodeJSRunner.hh"
-#import <libnode/node.hpp>
+#import <NodeMobile/NodeMobile.h>
 #import "NativeModule.hpp"
 
 #ifdef DEBUG

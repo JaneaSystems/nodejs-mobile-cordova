@@ -2,7 +2,7 @@ var fs = require('fs');
 var zlib = require('zlib');
 
 const nodeProjectFolder = 'www/nodejs-project';
-const libFolderPath = 'plugins/nodejs-mobile-cordova/libs/libnode/android/';
+const libFolderPath = 'plugins/nodejs-mobile-cordova/libs/android/libnode/bin/';
 const path_armv7 = libFolderPath + 'armeabi-v7a/';
 const path_x86 = libFolderPath + 'x86/'
 const lib_name = 'libnode.so';
