@@ -26,9 +26,11 @@ public class NodeJS extends CordovaPlugin {
   private static final String BUILTIN_ASSETS = "nodejs-mobile-cordova-assets";
   private static final String BUILTIN_MODULES = "nodejs-mobile-cordova-assets/builtin_modules";
   private static final String TRASH_DIR = "nodejs-project-trash";
+  private static final String BUILTIN_NATIVE_ASSETS_PREFIX = "nodejs-native-assets-";
   private static String nodeAppRootAbsolutePath = "";
   private static String nodePath = "";
   private static String trashDir = "";
+  private static String nativeAssetsPath = "";
 
   private static final String LAST_UPDATED_TIME = "NODEJS_MOBILE_APK_LastUpdateTime";
   private long lastUpdateTime = 1;
@@ -48,6 +50,7 @@ public class NodeJS extends CordovaPlugin {
 
   public native Integer startNodeWithArguments(String[] arguments, String nodePath);
   public native void sendToNode(String msg);
+  public native String getCurrentABIName();
 
   @Override
   public void pluginInitialize() {
@@ -60,6 +63,7 @@ public class NodeJS extends CordovaPlugin {
     NodeJS.nodeAppRootAbsolutePath = filesDir + "/" + NodeJS.PROJECT_ROOT;
     NodeJS.nodePath = filesDir + "/" + NodeJS.BUILTIN_MODULES;
     NodeJS.trashDir = filesDir + "/" + NodeJS.TRASH_DIR;
+    NodeJS.nativeAssetsPath = BUILTIN_NATIVE_ASSETS_PREFIX + getCurrentABIName();
 
     getLastUpdateTimes();
     copyAssetsIfRequired();
@@ -263,6 +267,29 @@ public class NodeJS extends CordovaPlugin {
     }
   }
 
+  private boolean copyNativeAssetsFrom() {
+    // Load the additional asset folder and files lists
+    ArrayList<String> nativeDirs = readFileFromAssets(nativeAssetsPath + "/dir.list");
+    ArrayList<String> nativeFiles = readFileFromAssets(nativeAssetsPath + "/file.list");
+    // Copy additional asset files to project working folder
+    boolean result = true;
+    if (nativeFiles.size() > 0) {
+      Log.v(LOGTAG, "Building folder hierarchy for " + nativeAssetsPath);
+      for (String dir : nativeDirs) {
+        new File(nodeAppRootAbsolutePath + "/" + dir).mkdirs();
+      }
+      Log.v(LOGTAG, "Copying assets using file list for " + nativeAssetsPath);
+      for (String file : nativeFiles) {
+        String src = nativeAssetsPath + "/" + file;
+        String dest = nodeAppRootAbsolutePath + "/" + file;
+        result &= copyAssetFile(src, dest);
+      }
+    } else {
+      Log.v(LOGTAG, "No assets to copy from " + nativeAssetsPath);
+    }
+    return result;
+  }
+
   private void copyAssetsIfRequired() {
     // The first time the app is executed and everytime the app is updated,
     // the nodejs-mobile assets are copied from the APK to a working folder.
@@ -302,6 +329,8 @@ public class NodeJS extends CordovaPlugin {
         Log.v(LOGTAG, "Copying assets enumerating the APK assets folder");
         result &= copyFolder(PROJECT_ROOT);
       }
+
+      result &= copyNativeAssetsFrom();
 
       if (result == false) {
         Log.e(LOGTAG, "Failed to copy assets");

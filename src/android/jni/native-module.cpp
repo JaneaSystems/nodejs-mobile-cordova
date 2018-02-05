@@ -31,6 +31,26 @@ extern "C" int callintoNode(int argc, char *argv[])
     return exit_code;
 }
 
+#if defined(__arm__)
+    #define CURRENT_ABI_NAME "armeabi-v7a"
+#elif defined(__aarch64__)
+    #define CURRENT_ABI_NAME "arm64-v8a"
+#elif defined(__i386__)
+    #define CURRENT_ABI_NAME "x86"
+#elif defined(__x86_64__)
+    #define CURRENT_ABI_NAME "x86_64"
+#else
+    #error "Trying to compile for an unknown ABI."
+#endif
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_janeasystems_cdvnodejsmobile_NodeJS_getCurrentABIName(
+    JNIEnv *env,
+    jobject /* this */) {
+    return env->NewStringUTF(CURRENT_ABI_NAME);
+}
+
 #define APPNAME "CORDOVABRIDGE"
 
 void rcv_message_from_node(char* msg) {
