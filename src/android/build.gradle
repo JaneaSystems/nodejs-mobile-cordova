@@ -28,20 +28,18 @@ android {
             abiFilters "armeabi-v7a", "x86"
         }
     }
-    
+
     externalNativeBuild {
         cmake {
-            path "CMakeLists.txt"
+            path "src/com/janeasystems/cdvnodejsmobile/jni/CMakeLists.txt"
         }
     }
-    
-    sourceSets {
-        main {
-            jniLibs.srcDirs '../../libs/android/libnode/bin/'
-        }
-    }
-    
+
     lintOptions {
         abortOnError false
     }
 }
+
+cdvPluginPostBuildExtras += { ->
+    android.sourceSets.main.jniLibs.srcDirs += 'src/com/janeasystems/cdvnodejsmobile/jni/libnode/bin/';
+};

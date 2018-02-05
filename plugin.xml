@@ -69,15 +69,12 @@
     <source-file src="src/android/jni/cordova-bridge.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
     <source-file src="src/android/jni/native-module.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
 
-    <source-file src="libs/android/libnode/include/node/" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="libs/android/libnode/" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
 
     <source-file src="install/nodejs-mobile-cordova-assets/" target-dir="assets/" />
 
-    <source-file src="libs/android/libnode/bin/armeabi-v7a" target-dir="libs/"/>
-    <source-file src="libs/android/libnode/bin/x86" target-dir="libs/"/>
-
     <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-    <source-file src="src/android/CMakeLists.txt" target-dir="."/>
+    <source-file src="src/android/CMakeLists.txt" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/"/>
 
   </platform>
 

@@ -17,13 +17,11 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             src/com/janeasystems/cdvnodejsmobile/jni/native-module.cpp
-             src/com/janeasystems/cdvnodejsmobile/jni/cordova-bridge.cpp
+             native-module.cpp
+             cordova-bridge.cpp
            )
 
-include_directories(libs/)
-include_directories(libs/android/libnode/include/node/)
-include_directories(src/com/janeasystems/cdvnodejsmobile/jni/)
+include_directories(libnode/include/)
 
 add_library( libnode
              SHARED
@@ -36,7 +34,7 @@ set_target_properties( # Specifies the target library.
                        PROPERTIES IMPORTED_LOCATION
 
                        # Provides the path to the library you want to import.
-                       ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/libnode.so )
+                       ${CMAKE_SOURCE_DIR}/libnode/bin/${ANDROID_ABI}/libnode.so )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
