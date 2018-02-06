@@ -22,6 +22,8 @@
   <platform name="ios">
 
     <hook type="before_plugin_install" src="install/hooks/ios/before-plugin-install.js" />
+    <hook type="after_plugin_install" src="install/hooks/ios/after-plugin-install.js" />
+    <hook type="before_plugin_uninstall" src="install/hooks/ios/before-plugin-uninstall.js" />
 
     <config-file target="config.xml" parent="/*">
       <feature name="NodeJS">
@@ -36,7 +38,7 @@
     <source-file src="src/ios/NativeModule.cpp" />
     <header-file src="src/ios/NodeJSRunner.hh" />
     <source-file src="src/ios/NodeJSRunner.mm" />
-    <header-file src="libs/ios/nodemobile/include/node" />
+    <header-file src="libs/ios/nodemobile/include" />
 
     <asset src="install/nodejs-mobile-cordova-assets" target="nodejs-mobile-cordova-assets" />
 
