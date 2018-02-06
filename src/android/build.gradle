@@ -40,6 +40,11 @@ android {
     }
 }
 
+cdvPluginPostBuildExtras += { ->
+    // gzip files will cause errors with aapt. Remove them for improved npm compatibility.
+    android.aaptOptions.ignoreAssetsPattern += ":!*.gz";
+};
+
 import org.gradle.internal.os.OperatingSystem;
 
 if ("1".equals(System.getenv('NODEJS_MOBILE_BUILD_NATIVE_MODULES'))) {

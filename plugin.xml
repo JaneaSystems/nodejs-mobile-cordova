@@ -24,6 +24,7 @@
     <hook type="before_plugin_install" src="install/hooks/ios/before-plugin-install.js" />
     <hook type="after_plugin_install" src="install/hooks/ios/after-plugin-install.js" />
     <hook type="before_plugin_uninstall" src="install/hooks/ios/before-plugin-uninstall.js" />
+    <hook type="after_prepare" src="install/hooks/both/after-prepare-patch-npm-packages.js" />
 
     <config-file target="config.xml" parent="/*">
       <feature name="NodeJS">
@@ -52,6 +53,7 @@
 
     <hook type="before_plugin_install" src="install/hooks/android/before-plugin-install.js" />
     <hook type="before_build" src="install/hooks/android/before-build.js" />
+    <hook type="after_prepare" src="install/hooks/both/after-prepare-patch-npm-packages.js" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="NodeJS">
