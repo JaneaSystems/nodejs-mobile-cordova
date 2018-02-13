@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <cstdlib>
 
-#include "node/node.h"
+#include "include/node/node.h"
 #include "cordova-bridge.h"
 
 #include <stdio.h>

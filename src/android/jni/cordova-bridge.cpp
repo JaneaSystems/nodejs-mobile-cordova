@@ -1,5 +1,5 @@
-#include "node/node_api.h"
-#include "node/uv.h"
+#include "include/node/node_api.h"
+#include "include/node/uv.h"
 #include "cordova-bridge.h"
 #define NM_F_BUILTIN 0x1
 #include <map>
