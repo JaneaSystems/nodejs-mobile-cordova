@@ -4,8 +4,8 @@
            id="nodejs-mobile-cordova"
       version="0.1.2">
 
-  <name>NodeJS Mobile</name>
-  <description>NodeJS for Mobile Cordova Plugin</description>
+  <name>Node.js Mobile</name>
+  <description>Node.js for Mobile Apps Cordova Plugin</description>
   <license>MIT</license>
   <keywords>cordova,mobile,nodejs,node.js</keywords>
 
@@ -35,8 +35,8 @@
 
     <header-file src="src/ios/CDVNodeJS.hh" />
     <source-file src="src/ios/CDVNodeJS.mm" />
-    <header-file src="src/ios/NativeModule.hpp" />
-    <source-file src="src/ios/NativeModule.cpp" />
+    <header-file src="src/common/cordova-bridge/cordova-bridge.h" />
+    <source-file src="src/common/cordova-bridge/cordova-bridge.cpp" />
     <header-file src="src/ios/NodeJSRunner.hh" />
     <source-file src="src/ios/NodeJSRunner.mm" />
     <header-file src="libs/ios/nodemobile/include" />
@@ -69,9 +69,9 @@
 
     <source-file src="src/android/java/com/janeasystems/cdvnodejsmobile/NodeJS.java" target-dir="src/com/janeasystems/cdvnodejsmobile/" />
 
-    <source-file src="src/android/jni/cordova-bridge.h" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
-    <source-file src="src/android/jni/cordova-bridge.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
-    <source-file src="src/android/jni/native-module.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="src/common/cordova-bridge/cordova-bridge.h" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="src/common/cordova-bridge/cordova-bridge.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="src/android/jni/native-lib.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
 
     <source-file src="libs/android/libnode/" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
 

@@ -1,8 +1,15 @@
+/*
+  Node.js for Mobile Apps Cordova plugin.
+
+  Implements the plugin APIs exposed to the Cordova layer and routes messages
+  between the Cordova layer and the Node.js engine.
+ */
+
 #import <Cordova/CDV.h>
 #import "CDVNodeJS.hh"
 #import "NodeJSRunner.hh"
 #import <NodeMobile/NodeMobile.h>
-#import "NativeModule.hpp"
+#import "cordova-bridge.h"
 
 #ifdef DEBUG
   #define LOG_FN NSLog(@"%s", __PRETTY_FUNCTION__);
@@ -15,7 +22,7 @@ static CDVNodeJS* activeInstance = nil;
 @implementation CDVNodeJS
 
 /**
- * A method that can be called from the C++ Node NativeModule.
+ * A method that can be called from the C++ Node native module (i.e. cordova-bridge.ccp).
  */
 void sendMessageToCordova(const char* msg) {
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithUTF8String:msg]];
@@ -125,6 +132,13 @@ NSString* messageListenerCallbackId = nil;
   NSString* scriptPath = nil;
   CDVPluginResult* pluginResult = nil;
   NSString* scriptFileName = [command argumentAtIndex:0];
+  NSDictionary* options = [command argumentAtIndex:1];
+
+#ifdef DEBUG
+  for (id key in [options allKeys]) {
+    NSLog(@"Start engine option: %@ -> %@", key, [options objectForKey:key]);
+  }
+#endif
 
   if ([scriptFileName length] == 0) {
     errorMsg = @"Arg was null";
@@ -159,6 +173,13 @@ NSString* messageListenerCallbackId = nil;
   NSString* errorMsg = nil;
   CDVPluginResult* pluginResult = nil;
   NSString* scriptBody = [command argumentAtIndex:0];
+  NSDictionary* options = [command argumentAtIndex:1];
+
+#ifdef DEBUG
+  for (id key in [options allKeys]) {
+    NSLog(@"Start engine option: %@ -> %@", key, [options objectForKey:key]);
+  }
+#endif
 
   if ([scriptBody length] == 0) {
     errorMsg = @"Script is empty";

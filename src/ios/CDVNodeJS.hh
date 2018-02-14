@@ -1,3 +1,9 @@
+/*
+  Node.js for Mobile Apps Cordova plugin.
+
+  The plugin APIs exposed to the Cordova layer.
+ */
+
 #import <Cordova/CDVPlugin.h>
 
 @interface CDVNodeJS : CDVPlugin

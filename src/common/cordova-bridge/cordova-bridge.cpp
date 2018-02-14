@@ -1,6 +1,12 @@
-#include "NativeModule.hpp"
+/*
+  Node.js for Mobile Apps Cordova plugin.
+
+  Implements the bridge APIs between the Cordova plugin and the Node.js engine.
+ */
+
 #include "include/node/node_api.h"
 #include "include/node/uv.h"
+#include "cordova-bridge.h"
 #define NM_F_BUILTIN 0x1
 #include <map>
 #include <mutex>
@@ -9,7 +15,7 @@
 #include <cstring>
 #include <cstdlib>
 
-//Some helper macros from node/test/addons-napi/common.h
+// Some helper macros from node/test/addons-napi/common.h
 
 // Empty value so that macros here are able to return NULL or void
 #define NAPI_RETVAL_NOTHING  // Intentionally blank #define
@@ -34,7 +40,7 @@
     if (!(assertion)) {                                                  \
       napi_throw_error(                                                  \
           (env),                                                         \
-        NULL,                                                            \
+          NULL,                                                          \
           "assertion (" #assertion ") failed: " message);                \
       return ret_val;                                                    \
     }                                                                    \
@@ -73,7 +79,7 @@ class QueuedFunc {
 
     void notify_message(char *s) {
       napi_env original_env = env;
-        
+
       napi_handle_scope scope;
       napi_open_handle_scope(original_env, &scope);
 
@@ -83,7 +89,7 @@ class QueuedFunc {
       napi_get_reference_value(original_env, original_function_ref, &callback);
       napi_value global;
       napi_get_global(original_env, &global);
-      
+
       napi_value message;
       napi_create_string_utf8(original_env, s, strlen(s), &message);
 
@@ -161,7 +167,7 @@ napi_value Method_RegisterListener(napi_env env, napi_callback_info info) {
   }
   size_t argc = 1;
   napi_value args[1];
-  NAPI_CALL(env, napi_get_cb_info(env,info,&argc,args,NULL,NULL));
+  NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, NULL, NULL));
   NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
 
   napi_value listener_function = args[0];
@@ -174,7 +180,7 @@ napi_value Method_RegisterListener(napi_env env, napi_callback_info info) {
 
   napi_value result;
   NAPI_CALL(env, napi_create_int32(env, my_little_pool_incrementer, &result));
-  
+
   QueuedFunc *af = new QueuedFunc(env, ref_to_function);
   pool[my_little_pool_incrementer++] = af;
 
@@ -186,10 +192,10 @@ napi_value Method_SendMessage(napi_env env, napi_callback_info info) {
   size_t argc = 1;
   napi_value args[1];
 
-  NAPI_CALL(env, napi_get_cb_info(env,info,&argc,args,NULL,NULL));
+  NAPI_CALL(env, napi_get_cb_info(env, info, &argc, args, NULL, NULL));
   NAPI_ASSERT(env, argc == 1, "Wrong number of arguments");
 
-  napi_value value_to_log=args[0];
+  napi_value value_to_log = args[0];
 
   napi_valuetype valuetype0;
   NAPI_CALL(env, napi_typeof(env, value_to_log, &valuetype0));
@@ -202,18 +208,18 @@ napi_value Method_SendMessage(napi_env env, napi_callback_info info) {
   size_t copied;
   NAPI_CALL(env, napi_get_value_string_utf8(env, value_to_log, NULL, 0, &length));
 
-  //C++ cleans it automatically.
-  std::unique_ptr<char[]> unique_buffer(new char[length+1]());
-  char *buff=unique_buffer.get();
+  // C++ cleans it automatically.
+  std::unique_ptr<char[]> unique_buffer(new char[length + 1]());
+  char *buff = unique_buffer.get();
 
-  NAPI_CALL(env, napi_get_value_string_utf8(env, value_to_log, buff, length+1, &copied));
+  NAPI_CALL(env, napi_get_value_string_utf8(env, value_to_log, buff, length + 1, &copied));
   NAPI_ASSERT(env, copied == length, "Couldn't fully copy the message");
-  NAPI_ASSERT(env, cordova_callback,"No callback is set in native code to receive the message");
+  NAPI_ASSERT(env, cordova_callback, "No callback is set in native code to receive the message");
 
   if (cordova_callback) {
     cordova_callback(buff);
   }
-  
+
   return nullptr;
 }
 

@@ -15,8 +15,8 @@ module.exports = function(context) {
   xcodeProject.parseSync();
   var firstTargetUUID = xcodeProject.getFirstTarget().uuid;
 
-  //Adds a build phase to rebuild native modules
-  var rebuildNativeModulesBuildPhaseName = 'Build NodeJS Mobile Native Modules';
+  // Adds a build phase to rebuild native modules.
+  var rebuildNativeModulesBuildPhaseName = 'Build Node.js Mobile Native Modules';
   var rebuildNativeModulesBuildPhaseScript = `
 set -e
 if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
@@ -55,8 +55,8 @@ popd
     );
   }
 
-  //Adds a build phase to sign native modules
-  var signNativeModulesBuildPhaseName = 'Sign NodeJS Mobile Native Modules';
+  // Adds a build phase to sign native modules.
+  var signNativeModulesBuildPhaseName = 'Sign Node.js Mobile Native Modules';
   var signNativeModulesBuildPhaseScript = `
 set -e
 if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then

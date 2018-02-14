@@ -18,7 +18,7 @@ cordova plugin add nodejs-mobile-cordova
 
 ## Reporting Issues
 
-We have a [central repo](https://github.com/janeasystems/nodejs-mobile/issues) where we manage all the issues related to Node.js for Mobile Apps, including specific issues of the Node.js for Mobile Cordova plugin.
+We have a [central repo](https://github.com/janeasystems/nodejs-mobile/issues) where we manage all the issues related to Node.js for Mobile Apps, including specific issues of the Node.js for Mobile Apps Cordova plugin.
 So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/issues).
 
 ## Cordova Methods
@@ -32,26 +32,52 @@ So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/
 ### nodejs.start
 
 ```js
-  nodejs.start(scriptFileName, callback);
+  nodejs.start(scriptFileName, callback [, options]);
 ```
+| Param | Type |
+| --- | --- |
+| scriptFileName | <code>string</code> |
+| callback | <code>function</code>  |
+| options | <code>[StartupOptions](#cordova.StartupOptions)</code>  |
+
 
 ### nodejs.startWithScript
 
 ```js
-  nodejs.startWithScript(scriptBody, callback);
+  nodejs.startWithScript(scriptBody, callback [, options]);
 ```
+| Param | Type |
+| --- | --- |
+| scriptBody | <code>string</code> |
+| callback | <code>function</code>  |
+| options | <code>[StartupOptions](#cordova.StartupOptions)</code>  |
 
 ### nodejs.channel.setListener
 
 ```js
   nodejs.channel.setListener(listenerCallback);
 ```
+| Param | Type |
+| --- | --- |
+| listenerCallback | <code>function</code> |
 
 ### nodejs.channel.send
 
 ```js
   nodejs.channel.send(message);
 ```
+| Param | Type |
+| --- | --- |
+| message | <code>string</code> |
+
+<a name="cordova.StartupOptions"></a>
+### StartupOptions: <code>object</code>
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| redirectOutputToLogcat | <code>boolean</code> | <code>true</code> | Allows to disable the redirection of the Node stdout/stderr to the Android logcat |
+
+Note: the stdout/stderr redirection is applied to the whole application, the side effect is that some undesired/duplicated output may appear in the logcat.
+For example, the Chromium console output `I/chromium: [INFO:CONSOLE(xx)]` is also sent to stderr and will show up in logcat has well, with the `NODEJS-MOBILE` log tag.
 
 ## Node.js Methods
 
@@ -67,13 +93,19 @@ So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/
 ```
  cordova.channel.send(message);
 ```
+| Param | Type |
+| --- | --- |
+| message | <code>string</code> |
 
 ### cordova.channel.on
 
 ```
  cordova.channel.on('message', listnerCallback);
 ```
-
+| Param | Type |
+| --- | --- |
+| 'message' | <code>const string</code> |
+| listnerCallback | <code>function</code> |
 
 ## Usage
 
@@ -111,8 +143,7 @@ Switch to Xcode:
  * enlarge the `Console` area, at the end of the console log it should show:
 
 ```
-2017-10-02 18:49:18.606100+0200 HelloCordova[2182:1463518] NodeJs Engine Started
+2017-10-02 18:49:18.606100+0200 HelloCordova[2182:1463518] Node.js Mobile Engine Started
 [node] received: Hello from Cordova!
 2017-10-02 18:49:18.690132+0200 HelloCordova[2182:1463518] [cordova] received: Replying to this message: Hello from Cordova!
 ```
-

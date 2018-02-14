@@ -4,7 +4,7 @@ var fs = require('fs');
 module.exports = function(context) {
   var xcode = context.requireCordovaModule('xcode');
 
-  //Adds a custom function to remove script build phases, which is not supported on cordova's Xcode module yet.
+  // Adds a custom function to remove script build phases, which is not supported on cordova's Xcode module yet.
   xcode.project.prototype.myRemovePbxScriptBuildPhase = function (buildPhaseName, target) {
     var buildPhaseTargetUuid = target || this.getFirstTarget().uuid;
 
@@ -14,7 +14,7 @@ module.exports = function(context) {
       throw new Error("Couldn't find the build script phase to remove: " + buildPhaseName );
     }
 
-    // remove the '_comment' suffix to get the actual uuid
+    // Remove the '_comment' suffix to get the actual uuid.
     var buildPhaseUuid=buildPhaseUuid_comment.split('_')[0];
 
     // Remove from the pbxBuildPhaseObjects
@@ -49,15 +49,15 @@ module.exports = function(context) {
   xcodeProject.parseSync();
   var firstTargetUUID = xcodeProject.getFirstTarget().uuid;
 
-  //Removes the build phase to rebuild native modules
-  var rebuildNativeModulesBuildPhaseName = 'Build NodeJS Mobile Native Modules';
+  // Removes the build phase to rebuild native modules.
+  var rebuildNativeModulesBuildPhaseName = 'Build Node.js Mobile Native Modules';
   var rebuildNativeModulesBuildPhase = xcodeProject.buildPhaseObject('PBXShellScriptBuildPhase', rebuildNativeModulesBuildPhaseName, firstTargetUUID);
   if (rebuildNativeModulesBuildPhase) {
     xcodeProject.myRemovePbxScriptBuildPhase(rebuildNativeModulesBuildPhaseName, firstTargetUUID);
   }
 
-  //Removes the build phase to sign native modules
-  var signNativeModulesBuildPhaseName = 'Sign NodeJS Mobile Native Modules';
+  // Removes the build phase to sign native modules.
+  var signNativeModulesBuildPhaseName = 'Sign Node.js Mobile Native Modules';
   var signNativeModulesBuildPhase = xcodeProject.buildPhaseObject('PBXShellScriptBuildPhase', signNativeModulesBuildPhaseName, firstTargetUUID);
   if (signNativeModulesBuildPhase) {
     xcodeProject.myRemovePbxScriptBuildPhase(signNativeModulesBuildPhaseName, firstTargetUUID);

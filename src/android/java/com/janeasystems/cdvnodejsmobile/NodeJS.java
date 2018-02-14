@@ -1,7 +1,15 @@
+/*
+  Node.js for Mobile Apps Cordova plugin.
+
+  Implements the plugin APIs exposed to the Cordova layer and routes messages
+  between the Cordova layer and the Node.js engine.
+ */
+
 package com.janeasystems.cdvnodejsmobile;
 
 import org.apache.cordova.*;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.json.JSONException;
 
 import android.util.Log;
@@ -37,18 +45,18 @@ public class NodeJS extends CordovaPlugin {
   private long previousLastUpdateTime = 0;
 
   private static boolean appPaused = false;
-  private static String LOGTAG = "NodeJS-Cordova";
+  private static String LOGTAG = "NODEJS-CORDOVA";
 
   private static boolean engineAlreadyStarted = false;
 
   private static CallbackContext channelListenerContext = null;
 
   static {
-    System.loadLibrary("native-module");
+    System.loadLibrary("nodejs-mobile-cordova-native-lib");
     System.loadLibrary("node");
   }
 
-  public native Integer startNodeWithArguments(String[] arguments, String nodePath);
+  public native Integer startNodeWithArguments(String[] arguments, String nodePath, boolean redirectOutputToLogcat);
   public native void sendToNode(String msg);
   public native String getCurrentABIName();
 
@@ -81,10 +89,12 @@ public class NodeJS extends CordovaPlugin {
       result = this.setChannelListener(callbackContext);
     } else if (action.equals("startEngine")) {
       String target = data.getString(0);
-      result = this.startEngine(target, callbackContext);
+      JSONObject startOptions = data.getJSONObject(1);
+      result = this.startEngine(target, startOptions, callbackContext);
     } else if (action.equals("startEngineWithScript")) {
       String scriptBody = data.getString(0);
-      result = this.startEngineWithScript(scriptBody, callbackContext);
+      JSONObject startOptions = data.getJSONObject(1);
+      result = this.startEngineWithScript(scriptBody, startOptions, callbackContext);
     } else {
       Log.e(LOGTAG, "Invalid action: " + action);
       result = false;
@@ -137,7 +147,8 @@ public class NodeJS extends CordovaPlugin {
     return true;
   }
 
-  private boolean startEngine(String scriptFileName, final CallbackContext callbackContext) {
+  private boolean startEngine(final String scriptFileName, final JSONObject startOptions,
+                              final CallbackContext callbackContext) {
     Log.v(LOGTAG, "StartEngine: " + scriptFileName);
 
     if (NodeJS.engineAlreadyStarted == true) {
@@ -158,6 +169,8 @@ public class NodeJS extends CordovaPlugin {
       return false;
     }
 
+    final boolean redirectOutputToLogcat = getOptionRedirectOutputToLogcat(startOptions);
+
     NodeJS.engineAlreadyStarted = true;
     Log.v(LOGTAG, "Script absolute path: " + scriptFileAbsolutePath);
     new Thread(new Runnable() {
@@ -165,7 +178,8 @@ public class NodeJS extends CordovaPlugin {
       public void run() {
         startNodeWithArguments(
                 new String[]{"node", scriptFileAbsolutePath},
-                NodeJS.nodePath);
+                NodeJS.nodePath,
+                redirectOutputToLogcat);
       }
     }).start();
 
@@ -173,7 +187,8 @@ public class NodeJS extends CordovaPlugin {
     return true;
   }
 
-  private boolean startEngineWithScript(String scriptBody, final CallbackContext callbackContext) {
+  private boolean startEngineWithScript(final String scriptBody, final JSONObject startOptions,
+                                        final CallbackContext callbackContext) {
     Log.v(LOGTAG, "StartEngineWithScript: " + scriptBody);
     boolean result = true;
     String errorMsg = "";
@@ -183,6 +198,8 @@ public class NodeJS extends CordovaPlugin {
       return false;
     }
 
+    final boolean redirectOutputToLogcat = getOptionRedirectOutputToLogcat(startOptions);
+
     final String scriptBodyToRun = new String(scriptBody);
     Log.v(LOGTAG, "Script absolute path: " + scriptBody);
     new Thread(new Runnable() {
@@ -190,7 +207,8 @@ public class NodeJS extends CordovaPlugin {
       public void run() {
         startNodeWithArguments(
                 new String[]{"node", "-e", scriptBodyToRun},
-                NodeJS.nodePath);
+                NodeJS.nodePath,
+                redirectOutputToLogcat);
       }
     }).start();
 
@@ -441,5 +459,29 @@ public class NodeJS extends CordovaPlugin {
       e.printStackTrace();
       return false;
     }
+  }
+
+  private static boolean getOptionRedirectOutputToLogcat(final JSONObject startOptions) {
+    if (BuildConfig.DEBUG) {
+      if (startOptions.names() != null) {
+        for (int i = 0; i < startOptions.names().length(); i++) {
+          try {
+            Log.v(LOGTAG, "Start engine option: " + startOptions.names().getString(i));
+          } catch (JSONException e) {
+          }
+        }
+      }
+    }
+
+    final String OPTION_NAME = "redirectOutputToLogcat";
+    boolean result = true;
+    if (startOptions.has(OPTION_NAME) == true) {
+      try {
+        result = startOptions.getBoolean(OPTION_NAME);
+      } catch(JSONException e) {
+        Log.e(LOGTAG, e.getMessage());
+      }
+    }
+    return result;
   }
 }

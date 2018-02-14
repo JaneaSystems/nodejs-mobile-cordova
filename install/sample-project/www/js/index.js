@@ -29,18 +29,21 @@ var app = {
 app.initialize();
     
 function channelListener(msg) {
-    console.log("[cordova] received:", msg);
-}
-  
+    console.log('[cordova] received: ' + msg);
+};
+
+function startupCallback(err) {
+    if (err) {
+        console.log(err);
+    } else {
+        console.log ('Node.js Mobile Engine Started');
+        nodejs.channel.send('Hello from Cordova!');
+    }
+};
+
 function startNodeProject() {
-nodejs.channel.setListener(channelListener);
-nodejs.start("main.js",
-             function(err) {
-               if (err) {
-                 console.log(err);
-               } else {
-                 console.log ("NodeJs Engine Started");
-                 nodejs.channel.send("Hello from Cordova!");
-               }
-             });
-}
+    nodejs.channel.setListener(channelListener);
+    nodejs.start('main.js', startupCallback);
+    // To disable the stdout/stderr redirection to the Android logcat:
+    // nodejs.start('main.js', startupCallback, { redirectOutputToLogcat: false });
+};

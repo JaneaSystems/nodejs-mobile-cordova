@@ -1,3 +1,10 @@
+/*
+  Node.js for Mobile Apps Cordova plugin.
+
+  Implements the API to start the Node.js engine from the Cordova plugin
+  native code.
+ */
+
 #import "NodeJSRunner.hh"
 #import <NodeMobile/NodeMobile.h>
 
