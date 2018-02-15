@@ -18,8 +18,18 @@ module.exports = function(context) {
   //Adds a build phase to rebuild native modules
   var rebuildNativeModulesBuildPhaseName = 'Build NodeJS Mobile Native Modules';
   var rebuildNativeModulesBuildPhaseScript = `
-if [ "1" != "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then exit 0; fi
 set -e
+if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
+# If build native modules preference is not set, try to find .gyp files
+#to turn it on.
+gypfiles=($(find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -type f -name "*.gyp"))
+if [ \${#gypfiles[@]} -gt 0 ]; then
+  NODEJS_MOBILE_BUILD_NATIVE_MODULES=1
+else
+  NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
+fi
+fi
+if [ "1" != "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then exit 0; fi
 # Get the nodejs-mobile-gyp location
 NODEJS_MOBILE_GYP_DIR="$( cd "$PROJECT_DIR" && cd ../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/ && pwd )"
 NODEJS_MOBILE_GYP_BIN_FILE="$NODEJS_MOBILE_GYP_DIR"/bin/node-gyp.js
@@ -48,6 +58,17 @@ popd
   //Adds a build phase to sign native modules
   var signNativeModulesBuildPhaseName = 'Sign NodeJS Mobile Native Modules';
   var signNativeModulesBuildPhaseScript = `
+set -e
+if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
+# If build native modules preference is not set, try to find .gyp files
+#to turn it on.
+gypfiles=($(find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -type f -name "*.gyp"))
+if [ \${#gypfiles[@]} -gt 0 ]; then
+  NODEJS_MOBILE_BUILD_NATIVE_MODULES=1
+else
+  NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
+fi
+fi
 if [ "1" != "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then exit 0; fi
 /usr/bin/codesign --force --sign $EXPANDED_CODE_SIGN_IDENTITY --preserve-metadata=identifier,entitlements,flags --timestamp=none $(find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -type f -name "*.node")
 `
