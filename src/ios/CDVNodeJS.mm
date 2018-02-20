@@ -42,14 +42,14 @@ NSString* messageListenerCallbackId = nil;
 
   NSString* const NODE_PATH = @"NODE_PATH";
   NSString* const BUILTIN_MODULES = @"/www/nodejs-mobile-cordova-assets/builtin_modules";
-  NSString* const NODE_MODULES = @"/www/nodejs-project/node_modules";
+  NSString* const NODE_ROOT = @"/www/nodejs-project/";
 
   // The 'onAppTerminate', 'onReset' and 'onMemoryWarning' events are already
   // registered in the super class while 'onPause' and 'onResume' are not.
   [[NSNotificationCenter defaultCenter] addObserver:self
                                         selector:@selector(onPause)
                                         name:UIApplicationDidEnterBackgroundNotification object:nil];
-  
+
   [[NSNotificationCenter defaultCenter] addObserver:self
                                         selector:@selector(onResume)
                                         name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -59,8 +59,8 @@ NSString* messageListenerCallbackId = nil;
   NSString* nodePath = [[NSProcessInfo processInfo] environment][NODE_PATH];
   NSString* appPath = [[NSBundle mainBundle] bundlePath];
   NSString* builtinModulesPath = [appPath stringByAppendingString:BUILTIN_MODULES];
-  NSString* nodeModulesPath = [appPath stringByAppendingString:NODE_MODULES];
-  
+  NSString* nodeRootPath = [appPath stringByAppendingString:NODE_ROOT];
+
   if (nodePath == NULL) {
     nodePath = builtinModulesPath;
   } else {
@@ -68,8 +68,8 @@ NSString* messageListenerCallbackId = nil;
     nodePath = [nodePath stringByAppendingString:builtinModulesPath];
   }
   nodePath = [nodePath stringByAppendingString:@":"];
-  nodePath = [nodePath stringByAppendingString:nodeModulesPath];
-  
+  nodePath = [nodePath stringByAppendingString:nodeRootPath];
+
   setenv([NODE_PATH UTF8String], (const char*)[nodePath UTF8String], 1);
 
   activeInstance = self;

@@ -69,7 +69,7 @@ public class NodeJS extends CordovaPlugin {
 
     NodeJS.filesDir = activity.getBaseContext().getFilesDir().getAbsolutePath();
     NodeJS.nodeAppRootAbsolutePath = filesDir + "/" + NodeJS.PROJECT_ROOT;
-    NodeJS.nodePath = filesDir + "/" + NodeJS.BUILTIN_MODULES;
+    NodeJS.nodePath = NodeJS.nodeAppRootAbsolutePath + ":" + filesDir + "/" + NodeJS.BUILTIN_MODULES;
     NodeJS.trashDir = filesDir + "/" + NodeJS.TRASH_DIR;
     NodeJS.nativeAssetsPath = BUILTIN_NATIVE_ASSETS_PREFIX + getCurrentABIName();
 
@@ -201,7 +201,6 @@ public class NodeJS extends CordovaPlugin {
     final boolean redirectOutputToLogcat = getOptionRedirectOutputToLogcat(startOptions);
 
     final String scriptBodyToRun = new String(scriptBody);
-    Log.v(LOGTAG, "Script absolute path: " + scriptBody);
     new Thread(new Runnable() {
       @Override
       public void run() {
