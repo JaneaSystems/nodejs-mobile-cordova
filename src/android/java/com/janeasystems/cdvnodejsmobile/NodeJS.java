@@ -23,10 +23,12 @@ import android.content.SharedPreferences;
 import java.io.*;
 import java.lang.System;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class NodeJS extends CordovaPlugin {
 
   private static Activity activity = null;
+  private static Context context = null;
   private static AssetManager assetManager = null;
 
   private static String filesDir;
@@ -40,9 +42,14 @@ public class NodeJS extends CordovaPlugin {
   private static String trashDir = "";
   private static String nativeAssetsPath = "";
 
+  private static final String SHARED_PREFS = "NODEJS_MOBILE_PREFS";
   private static final String LAST_UPDATED_TIME = "NODEJS_MOBILE_APK_LastUpdateTime";
   private long lastUpdateTime = 1;
   private long previousLastUpdateTime = 0;
+
+  private static Semaphore initSemaphore = new Semaphore(1);
+  private static boolean initCompleted = false;
+  private static IOException ioe = null;
 
   private static boolean appPaused = false;
   private static String LOGTAG = "NODEJS-CORDOVA";
@@ -62,51 +69,77 @@ public class NodeJS extends CordovaPlugin {
 
   @Override
   public void pluginInitialize() {
-    Log.v(LOGTAG, "pluginInitialize");
+    Log.d(LOGTAG, "pluginInitialize");
 
-    this.activity = cordova.getActivity();
-    this.assetManager = activity.getBaseContext().getAssets();
+    activity = cordova.getActivity();
+    context = activity.getBaseContext();
+    assetManager = activity.getBaseContext().getAssets();
 
-    NodeJS.filesDir = activity.getBaseContext().getFilesDir().getAbsolutePath();
-    NodeJS.nodeAppRootAbsolutePath = filesDir + "/" + NodeJS.PROJECT_ROOT;
-    NodeJS.nodePath = NodeJS.nodeAppRootAbsolutePath + ":" + filesDir + "/" + NodeJS.BUILTIN_MODULES;
-    NodeJS.trashDir = filesDir + "/" + NodeJS.TRASH_DIR;
-    NodeJS.nativeAssetsPath = BUILTIN_NATIVE_ASSETS_PREFIX + getCurrentABIName();
+    filesDir = context.getFilesDir().getAbsolutePath();
+    nodeAppRootAbsolutePath = filesDir + "/" + PROJECT_ROOT;
+    nodePath = nodeAppRootAbsolutePath + ":" + filesDir + "/" + BUILTIN_MODULES;
+    trashDir = filesDir + "/" + TRASH_DIR;
+    nativeAssetsPath = BUILTIN_NATIVE_ASSETS_PREFIX + getCurrentABIName();
 
-    getLastUpdateTimes();
-    copyAssetsIfRequired();
-    emptyTrashAsync();
+    asyncInit();
+  }
+
+  private void asyncInit() {
+    if (wasAPKUpdated()) {
+      try {
+        initSemaphore.acquire();
+        new Thread(new Runnable() {
+          @Override
+          public void run() {
+            emptyTrash();
+            try {
+              copyNodeJSAssets();
+              initCompleted = true;
+            } catch (IOException e) {
+              ioe = e;
+              Log.e(LOGTAG, "Node assets copy failed: " + e.toString());
+              e.printStackTrace();
+            }
+            initSemaphore.release();
+            emptyTrash();
+          }
+        }).start();
+      } catch (InterruptedException ie) {
+        initSemaphore.release();
+        ie.printStackTrace();
+      }
+    } else {
+      initCompleted = true;
+    }
   }
 
   @Override
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
-    boolean result = false;
-
     if (action.equals("sendMessageToNode")) {
       String msg = data.getString(0);
-      result = this.sendMessageToNode(msg);
+      this.sendMessageToNode(msg);
     } else if (action.equals("setChannelListener")) {
-      result = this.setChannelListener(callbackContext);
+      this.setChannelListener(callbackContext);
     } else if (action.equals("startEngine")) {
       String target = data.getString(0);
       JSONObject startOptions = data.getJSONObject(1);
-      result = this.startEngine(target, startOptions, callbackContext);
+      this.startEngine(target, startOptions, callbackContext);
     } else if (action.equals("startEngineWithScript")) {
       String scriptBody = data.getString(0);
       JSONObject startOptions = data.getJSONObject(1);
-      result = this.startEngineWithScript(scriptBody, startOptions, callbackContext);
+      this.startEngineWithScript(scriptBody, startOptions, callbackContext);
     } else {
       Log.e(LOGTAG, "Invalid action: " + action);
-      result = false;
+      return false;
     }
 
-    return result;
+    return true;
   }
 
   @Override
   public void onPause(boolean multitasking) {
     super.onPause(multitasking);
-    Log.v(LOGTAG, "onPause");
+    Log.d(LOGTAG, "onPause");
     // (todo) add call to node land through JNI method
     appPaused = true;
   }
@@ -114,17 +147,14 @@ public class NodeJS extends CordovaPlugin {
   @Override
   public void onResume(boolean multitasking) {
     super.onResume(multitasking);
-    Log.v(LOGTAG, "onResume");
+    Log.d(LOGTAG, "onResume");
     // (todo) add call to node land through JNI method
     appPaused = false;
   }
 
-  private boolean sendMessageToNode(String msg) {
-    Log.v(LOGTAG, "sendMessageToNode: " + msg);
-
+  private void sendMessageToNode(String msg) {
+    Log.d(LOGTAG, "sendMessageToNode: " + msg);
     sendToNode(msg);
-
-    return true;
   }
 
   public static void sendMessageToCordova(String msg) {
@@ -139,82 +169,93 @@ public class NodeJS extends CordovaPlugin {
     });
   }
 
-  private boolean setChannelListener(final CallbackContext callbackContext) {
-    Log.v(LOGTAG, "setChannelListener");
-
+  private void setChannelListener(final CallbackContext callbackContext) {
+    Log.d(LOGTAG, "setChannelListener");
     NodeJS.channelListenerContext = callbackContext;
-
-    return true;
   }
 
-  private boolean startEngine(final String scriptFileName, final JSONObject startOptions,
-                              final CallbackContext callbackContext) {
-    Log.v(LOGTAG, "StartEngine: " + scriptFileName);
+  private void startEngine(final String scriptFileName, final JSONObject startOptions,
+                           final CallbackContext callbackContext) {
+    Log.d(LOGTAG, "StartEngine: " + scriptFileName);
 
     if (NodeJS.engineAlreadyStarted == true) {
       sendResult(false, "Engine already started", callbackContext);
-      return false;
+      return;
     }
+    NodeJS.engineAlreadyStarted = true;
 
     if (scriptFileName == null && scriptFileName.isEmpty()) {
       sendResult(false, "Invalid filename", callbackContext);
-      return false;
+      return;
     }
 
     final String scriptFileAbsolutePath = new String(NodeJS.nodeAppRootAbsolutePath + "/" + scriptFileName);
-    File fileObject = new File(scriptFileAbsolutePath);
-
-    if (!fileObject.exists()) {
-      sendResult(false, "File not found", callbackContext);
-      return false;
-    }
+    Log.d(LOGTAG, "Script absolute path: " + scriptFileAbsolutePath);
 
     final boolean redirectOutputToLogcat = getOptionRedirectOutputToLogcat(startOptions);
 
-    NodeJS.engineAlreadyStarted = true;
-    Log.v(LOGTAG, "Script absolute path: " + scriptFileAbsolutePath);
     new Thread(new Runnable() {
       @Override
       public void run() {
+        waitForInit();
+
+        if (ioe != null) {
+          sendResult(false, "Initialization failed: " + ioe.toString(), callbackContext);
+          return;
+        }
+
+        File fileObject = new File(scriptFileAbsolutePath);
+        if (!fileObject.exists()) {
+          sendResult(false, "File not found", callbackContext);
+          return;
+        }
+
+        sendResult(true, "", callbackContext);
+
         startNodeWithArguments(
-                new String[]{"node", scriptFileAbsolutePath},
-                NodeJS.nodePath,
-                redirectOutputToLogcat);
+            new String[]{"node", scriptFileAbsolutePath},
+            NodeJS.nodePath,
+            redirectOutputToLogcat);
       }
     }).start();
-
-    sendResult(true, "", callbackContext);
-    return true;
   }
 
-  private boolean startEngineWithScript(final String scriptBody, final JSONObject startOptions,
+  private void startEngineWithScript(final String scriptBody, final JSONObject startOptions,
                                         final CallbackContext callbackContext) {
-    Log.v(LOGTAG, "StartEngineWithScript: " + scriptBody);
-    boolean result = true;
-    String errorMsg = "";
+    Log.d(LOGTAG, "StartEngineWithScript: " + scriptBody);
 
     if (NodeJS.engineAlreadyStarted == true) {
       sendResult(false, "Engine already started", callbackContext);
-      return false;
+      return;
+    }
+    NodeJS.engineAlreadyStarted = true;
+
+    if (scriptBody == null || scriptBody.isEmpty()) {
+      sendResult(false, "Invalid script", callbackContext);
+      return;
     }
 
     final boolean redirectOutputToLogcat = getOptionRedirectOutputToLogcat(startOptions);
-
     final String scriptBodyToRun = new String(scriptBody);
+
     new Thread(new Runnable() {
       @Override
       public void run() {
+        waitForInit();
+
+        if (ioe != null) {
+          sendResult(false, "Initialization failed: " + ioe.toString(), callbackContext);
+          return;
+        }
+
+        sendResult(true, "", callbackContext);
+
         startNodeWithArguments(
-                new String[]{"node", "-e", scriptBodyToRun},
-                NodeJS.nodePath,
-                redirectOutputToLogcat);
+            new String[]{"node", "-e", scriptBodyToRun},
+            NodeJS.nodePath,
+            redirectOutputToLogcat);
       }
     }).start();
-
-    NodeJS.engineAlreadyStarted = true;
-
-    sendResult(true, null, callbackContext);
-    return true;
   }
 
   /**
@@ -250,121 +291,116 @@ public class NodeJS extends CordovaPlugin {
    * Private assets helpers
    */
 
-  private void getLastUpdateTimes() {
-    SharedPreferences prefs = this.activity.getPreferences(Context.MODE_PRIVATE);
-    this.previousLastUpdateTime = prefs.getLong(LAST_UPDATED_TIME, 0);
-
-    try {
-      PackageInfo packageInfo = this.activity.getPackageManager().getPackageInfo(this.activity.getPackageName(), 0);
-      this.lastUpdateTime = packageInfo.lastUpdateTime;
-    } catch (PackageManager.NameNotFoundException e) {
-      Log.e(LOGTAG, e.getMessage());
-      e.printStackTrace();
+  private void waitForInit() {
+    if (!initCompleted) {
+      try {
+        initSemaphore.acquire();
+        initSemaphore.release();
+      } catch (InterruptedException ie) {
+        initSemaphore.release();
+        ie.printStackTrace();
+      }
     }
   }
 
-  private void emptyTrashSync() {
+  private boolean wasAPKUpdated() {
+    SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    this.previousLastUpdateTime = prefs.getLong(LAST_UPDATED_TIME, 0);
+
+    try {
+      PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+      this.lastUpdateTime = packageInfo.lastUpdateTime;
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+    return (this.lastUpdateTime != this.previousLastUpdateTime);
+  }
+
+  private void saveLastUpdateTime() {
+    SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putLong(LAST_UPDATED_TIME, this.lastUpdateTime);
+    editor.commit();
+  }
+
+  private void emptyTrash() {
     File trash = new File(NodeJS.trashDir);
     if (trash.exists()) {
-      Log.v(LOGTAG, "Deleting the trash folder (sync)");
       deleteFolderRecursively(trash);
     }
   }
 
-  private void emptyTrashAsync() {
-    File trash = new File(NodeJS.trashDir);
-    if (trash.exists()) {
-      new Thread(new Runnable() {
-        public void run() {
-          Log.v(LOGTAG, "Deleting the trash folder (async)");
-          File trash = new File(NodeJS.trashDir);
-          deleteFolderRecursively(trash);
-        }
-      }).start();
-    }
-  }
-
-  private boolean copyNativeAssetsFrom() {
-    // Load the additional asset folder and files lists
+  private void copyNativeAssets() throws IOException {
+    // Load the additional asset folders and files lists
     ArrayList<String> nativeDirs = readFileFromAssets(nativeAssetsPath + "/dir.list");
     ArrayList<String> nativeFiles = readFileFromAssets(nativeAssetsPath + "/file.list");
+
     // Copy additional asset files to project working folder
-    boolean result = true;
     if (nativeFiles.size() > 0) {
-      Log.v(LOGTAG, "Building folder hierarchy for " + nativeAssetsPath);
+      Log.d(LOGTAG, "Building folder hierarchy for " + nativeAssetsPath);
       for (String dir : nativeDirs) {
         new File(nodeAppRootAbsolutePath + "/" + dir).mkdirs();
       }
-      Log.v(LOGTAG, "Copying assets using file list for " + nativeAssetsPath);
+      Log.d(LOGTAG, "Copying assets using file list for " + nativeAssetsPath);
       for (String file : nativeFiles) {
         String src = nativeAssetsPath + "/" + file;
         String dest = nodeAppRootAbsolutePath + "/" + file;
-        result &= copyAssetFile(src, dest);
+        copyAssetFile(src, dest);
       }
     } else {
-      Log.v(LOGTAG, "No assets to copy from " + nativeAssetsPath);
+      Log.d(LOGTAG, "No assets to copy from " + nativeAssetsPath);
     }
-    return result;
   }
 
-  private void copyAssetsIfRequired() {
-    // The first time the app is executed and everytime the app is updated,
-    // the nodejs-mobile assets are copied from the APK to a working folder.
-    if (this.lastUpdateTime != this.previousLastUpdateTime) {
-      // In case a previous startup went wrong, make sure the trash is cleaned up
-      emptyTrashSync();
-
-      File folderObject = new File(NodeJS.filesDir + "/" + PROJECT_ROOT);
-      if (folderObject.exists()) {
-        Log.v(LOGTAG, "Moving existing project folder to trash");
-        File trash = new File(NodeJS.trashDir);
-        folderObject.renameTo(trash);
-      }
-
-      // Delete the existing plugin assets in the working folder and copy them again from the APK
-      folderObject = new File(NodeJS.filesDir + "/" + BUILTIN_ASSETS);
-      deleteFolderRecursively(folderObject);
-      boolean result = copyFolder(BUILTIN_ASSETS);
-
-      // Load the nodejs project's folder and files lists
-      ArrayList<String> dirs = readFileFromAssets("dir.list");
-      ArrayList<String> files = readFileFromAssets("file.list");
-      // Copy project files to project working folder
-      if (dirs.size() > 0 && files.size() > 0) {
-        Log.v(LOGTAG, "Building folder hierarchy");
-        for (String dir : dirs) {
-          new File(NodeJS.filesDir + "/" + dir).mkdirs();
-        }
-
-        Log.v(LOGTAG, "Copying assets using file list");
-        for (String file : files) {
-          String src = file;
-          String dest = NodeJS.filesDir + "/" + file;
-          NodeJS.copyAssetFile(src, dest);
-        }
-      } else {
-        Log.v(LOGTAG, "Copying assets enumerating the APK assets folder");
-        result &= copyFolder(PROJECT_ROOT);
-      }
-
-      result &= copyNativeAssetsFrom();
-
-      if (result == false) {
-        Log.e(LOGTAG, "Failed to copy assets");
-      } else {
-        Log.v(LOGTAG, "Assets copied");
-        // Persist the APK last update time
-        SharedPreferences prefs = this.activity.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putLong(LAST_UPDATED_TIME, this.lastUpdateTime);
-        editor.commit();
-      }
+  private void copyNodeJSAssets() throws IOException {
+    // Delete the existing plugin assets in the working folder
+    File nodejsBuiltinModulesFolder = new File(NodeJS.filesDir + "/" + BUILTIN_ASSETS);
+    if (nodejsBuiltinModulesFolder.exists()) {
+      deleteFolderRecursively(nodejsBuiltinModulesFolder);
     }
+    // Copy the plugin assets from the APK
+    copyFolder(BUILTIN_ASSETS);
+
+    // If present, move the existing node project root to the trash
+    File nodejsProjectFolder = new File(NodeJS.filesDir + "/" + PROJECT_ROOT);
+    if (nodejsProjectFolder.exists()) {
+      Log.d(LOGTAG, "Moving existing project folder to trash");
+      File trash = new File(NodeJS.trashDir);
+      nodejsProjectFolder.renameTo(trash);
+    }
+    nodejsProjectFolder.mkdirs();
+
+    // Load the nodejs project's folders and files lists
+    ArrayList<String> dirs = readFileFromAssets("dir.list");
+    ArrayList<String> files = readFileFromAssets("file.list");
+
+    // Copy the node project files to the project working folder
+    if (files.size() > 0) {
+      Log.d(LOGTAG, "Copying node project assets using the files list");
+
+      for (String dir : dirs) {
+        new File(NodeJS.filesDir + "/" + dir).mkdirs();
+      }
+
+      for (String file : files) {
+        String src = file;
+        String dest = NodeJS.filesDir + "/" + file;
+        NodeJS.copyAssetFile(src, dest);
+      }
+    } else {
+      Log.d(LOGTAG, "Copying node project assets enumerating the APK assets folder");
+      copyFolder(PROJECT_ROOT);
+    }
+
+    // Copy native modules assets
+    copyNativeAssets();
+
+    Log.d(LOGTAG, "Node assets copied");
+    saveLastUpdateTime();
   }
 
   private ArrayList<String> readFileFromAssets(String filename){
     ArrayList lines = new ArrayList();
-    final Context context = this.activity.getBaseContext();
     try {
       BufferedReader reader = new BufferedReader(new InputStreamReader(context.getAssets().open(filename)));
       String line = reader.readLine();
@@ -373,65 +409,44 @@ public class NodeJS extends CordovaPlugin {
         line = reader.readLine();
       }
       reader.close();
+    } catch (FileNotFoundException e) {
+      Log.d(LOGTAG, "File not found: " + filename);
     } catch (IOException e) {
-      Log.e(LOGTAG, e.getMessage());
+      e.printStackTrace();
       lines = new ArrayList();
     }
-
     return lines;
   }
 
-  private static boolean copyFolder(String srcFolder) {
-    boolean result = true;
-    String destFolder = NodeJS.filesDir + "/" + srcFolder;
-    File folderObject = new File(destFolder);
-    if (folderObject.exists()) {
-      result &= deleteFolderRecursively(folderObject);
-    }
-    result &= copyAssetFolder(srcFolder, destFolder);
-
-    return result;
+  private void copyFolder(String srcFolder) throws IOException {
+    copyAssetFolder(srcFolder, NodeJS.filesDir + "/" + srcFolder);
   }
 
   // Adapted from https://stackoverflow.com/a/22903693
-  private static boolean copyAssetFolder(String srcFolder, String destPath) {
-    try {
-      String[] files = assetManager.list(srcFolder);
-      boolean result = true;
-
-      if (files.length == 0) {
-        result &= copyAssetFile(srcFolder, destPath);
-      } else {
-        new File(destPath).mkdirs();
-        for (String file : files) {
-          result &= copyAssetFolder(srcFolder + "/" + file, destPath + "/" + file);
-        }
+  private static void copyAssetFolder(String srcFolder, String destPath) throws IOException {
+    String[] files = assetManager.list(srcFolder);
+    if (files.length == 0) {
+      // Copy the file
+      copyAssetFile(srcFolder, destPath);
+    } else {
+      // Create the folder
+      new File(destPath).mkdirs();
+      for (String file : files) {
+        copyAssetFolder(srcFolder + "/" + file, destPath + "/" + file);
       }
-      return result;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
     }
   }
 
-  private static boolean copyAssetFile(String srcFolder, String destPath) {
-    InputStream in = null;
-    OutputStream out = null;
-    try {
-      in = assetManager.open(srcFolder);
-      new File(destPath).createNewFile();
-      out = new FileOutputStream(destPath);
-      copyFile(in, out);
-      in.close();
-      in = null;
-      out.flush();
-      out.close();
-      out = null;
-      return true;
-    } catch(Exception e) {
-      e.printStackTrace();
-      return false;
-    }
+  private static void copyAssetFile(String srcFolder, String destPath) throws IOException {
+    InputStream in = assetManager.open(srcFolder);
+    new File(destPath).createNewFile();
+    OutputStream out = new FileOutputStream(destPath);
+    copyFile(in, out);
+    in.close();
+    in = null;
+    out.flush();
+    out.close();
+    out = null;
   }
 
   private static void copyFile(InputStream in, OutputStream out) throws IOException {
@@ -442,21 +457,18 @@ public class NodeJS extends CordovaPlugin {
     }
   }
 
-  private static boolean deleteFolderRecursively(File file) {
+  private static void deleteFolderRecursively(File file) {
     try {
-      boolean result = true;
       for (File childFile : file.listFiles()) {
         if (childFile.isDirectory()) {
-          result &= deleteFolderRecursively(childFile);
+          deleteFolderRecursively(childFile);
         } else {
-          result &= childFile.delete();
+          childFile.delete();
         }
       }
-      result &= file.delete();
-      return result;
+      file.delete();
     } catch (Exception e) {
       e.printStackTrace();
-      return false;
     }
   }
 
@@ -465,7 +477,7 @@ public class NodeJS extends CordovaPlugin {
       if (startOptions.names() != null) {
         for (int i = 0; i < startOptions.names().length(); i++) {
           try {
-            Log.v(LOGTAG, "Start engine option: " + startOptions.names().getString(i));
+            Log.d(LOGTAG, "Start engine option: " + startOptions.names().getString(i));
           } catch (JSONException e) {
           }
         }
@@ -478,7 +490,7 @@ public class NodeJS extends CordovaPlugin {
       try {
         result = startOptions.getBoolean(OPTION_NAME);
       } catch(JSONException e) {
-        Log.e(LOGTAG, e.getMessage());
+        e.printStackTrace();
       }
     }
     return result;
