@@ -42,11 +42,22 @@ cdvPluginPostBuildExtras += { ->
     android.aaptOptions.ignoreAssetsPattern += ":!*.gz";
     // The MacOS builder helper script is not needed inside the APK.
     android.aaptOptions.ignoreAssetsPattern += ":!build-native-modules-MacOS-helper-script.sh";
+    // The file that caches the value of NODEJS_MOBILE_BUILD_NATIVE_MODULES is not needed inside the APK.
+    android.aaptOptions.ignoreAssetsPattern += ":!NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt";
 };
 
 import org.gradle.internal.os.OperatingSystem;
 
 String shouldRebuildNativeModules = System.getenv('NODEJS_MOBILE_BUILD_NATIVE_MODULES');
+
+if (shouldRebuildNativeModules==null) {
+// If the environment variable is not set right now, check if it has been saved to a file during
+// the cordova prepare phase.
+    def nativeModulesPreferenceFile = file("${project.projectDir}/assets/www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt");
+    if (nativeModulesPreferenceFile.exists()) {
+        shouldRebuildNativeModules=nativeModulesPreferenceFile.text;
+    }
+}
 
 if (shouldRebuildNativeModules==null) {
 // If build native modules preference is not set, try to find .gyp files to turn it on.
