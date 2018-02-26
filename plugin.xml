@@ -54,6 +54,7 @@
     <hook type="before_plugin_install" src="install/hooks/android/before-plugin-install.js" />
     <hook type="before_build" src="install/hooks/android/before-build.js" />
     <hook type="after_prepare" src="install/hooks/both/after-prepare-patch-npm-packages.js" />
+    <hook type="after_prepare" src="install/hooks/android/after-prepare-create-macOS-builder-helper.js" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="NodeJS">

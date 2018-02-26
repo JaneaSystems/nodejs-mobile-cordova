@@ -40,6 +40,8 @@ android {
 cdvPluginPostBuildExtras += { ->
     // gzip files will cause errors with aapt. Remove them for improved npm compatibility.
     android.aaptOptions.ignoreAssetsPattern += ":!*.gz";
+    // The MacOS builder helper script is not needed inside the APK.
+    android.aaptOptions.ignoreAssetsPattern += ":!build-native-modules-MacOS-helper-script.sh";
 };
 
 import org.gradle.internal.os.OperatingSystem;
@@ -63,6 +65,27 @@ if (shouldRebuildNativeModules==null) {
 }
 
 if ("1".equals(shouldRebuildNativeModules)) {
+
+    String npmCommandName = 'npm';
+    if (OperatingSystem.current().isMacOsX()) {
+        // On macOS, npm's location may not be in the PATH environment variable if gradle is being run
+        // by Android Studio. We need npm to build native modules, so we use a helper script that
+        // is created by a Cordova prepare hook to run npm with the PATH members that were available
+        // during the prepare event.
+        try {
+            def commandResult = exec {
+                commandLine 'command', '-v', 'npm'
+                ignoreExitValue = true
+            }
+            if ( commandResult.getExitValue() != 0 ) {
+                // If npm is not found by command, use the helper script.
+                logger.warn("Couldn't find npm in the PATH for building native modules. Will try to use a helper script.");
+                npmCommandName = '../build-native-modules-MacOS-helper-script.sh';
+            }
+        } catch ( Exception e ) {
+            throw new GradleException('Something went wrong looking for npm by running "command".', e)
+        }
+    }
 
     android.defaultConfig.ndk.abiFilters.each { abi_name ->
         String temp_arch = {
@@ -150,6 +173,13 @@ if ("1".equals(shouldRebuildNativeModules)) {
                     from "${project.projectDir}/assets/www/nodejs-project/"
                     into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
                 }
+                if (OperatingSystem.current().isMacOsX()) {
+                    // Copy the helper script for calling npm when building in Android Studio on macOS.
+                    copy {
+                        from "${project.projectDir}/assets/www/build-native-modules-MacOS-helper-script.sh"
+                        into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
+                    }
+                }
                 new File("${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp").text = "${new Date().format('yyyy-MM-dd HH:mm:ss')}"
             }
         }
@@ -168,7 +198,7 @@ if ("1".equals(shouldRebuildNativeModules)) {
             outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
             description = "Building native modules for ${abi_name}."
             workingDir "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
-            commandLine 'npm', '--verbose', 'rebuild', '--build-from-source'
+            commandLine npmCommandName, '--verbose', 'rebuild', '--build-from-source'
             //environment ('PATH', "${npm_toolchain_add_to_path}" + System.getProperty("path.separator") + "${System.env.PATH}")
             environment ('npm_config_node_engine', 'v8' )
             environment ('npm_config_nodedir', "${project.projectDir}/src/com/janeasystems/cdvnodejsmobile/jni/libnode/" )
