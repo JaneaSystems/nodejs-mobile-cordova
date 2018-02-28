@@ -9,7 +9,9 @@ ChannelEmitter.prototype.send = function (msg) {
 const channel = new ChannelEmitter();
 
 NativeBridge.setListener(function (msg) {
-  channel.emit('message', msg);
+  setImmediate( () => {
+    channel.emit('message', msg);
+  });
 });
 
 exports.channel = channel;
