@@ -106,12 +106,12 @@ For example, the Chromium console output `I/chromium: [INFO:CONSOLE(xx)]` is als
 ### cordova.channel.on
 
 ```
- cordova.channel.on('message', listnerCallback);
+ cordova.channel.on('message', listenerCallback);
 ```
 | Param | Type |
 | --- | --- |
 | 'message' | <code>const string</code> |
-| listnerCallback | <code>function</code> |
+| listenerCallback | <code>function</code> |
 
 ## Usage
 
@@ -200,13 +200,13 @@ After the project files have been created, either manually or using the helper s
 ```bash
 $ open platforms/ios/HelloCordova.xcodeproj
 ```
-Switch to Xcode:  
- * select HelloCordova to view the project settings  
- * in the `General` settings:  
-    * in the `Signing` section select a team to sign the app  
-    * in `Deployment Info` section select `Deployment Target` `11.0` or higher  
+Switch to Xcode:
+ * select HelloCordova to view the project settings
+ * in the `General` settings:
+    * in the `Signing` section select a team to sign the app
+    * in `Deployment Info` section select `Deployment Target` `11.0` or higher
 
-Go back to `Terminal` to build the Cordova app 
+Go back to `Terminal` to build the Cordova app
 ```bash
 $ cordova build ios --device
 ```
@@ -222,23 +222,23 @@ Switch to Xcode:
 ```
 
 ## Node Modules
-Node modules can be added to the project using `npm`.  
-The Node modules have to be installed in the `./www/nodejs-project/` folder and a `package.json` file needs to be added to the folder.  
+Node modules can be added to the project using `npm`.
+The Node modules have to be installed in the `./www/nodejs-project/` folder and a `package.json` file needs to be added to the folder.
 
-If you used the helper script to install the sample project, the `package.json` file is already present and you can proceed adding the desired Node modules.  
+If you used the helper script to install the sample project, the `package.json` file is already present and you can proceed adding the desired Node modules.
 
-If you don't know how to create the `package.json` file, just copy the sample one from `./plugins/nodejs-mobile-cordova/install/sample-project/www/nodejs-project/package.json`.  
-Then proceed with the installation of the Node modules you want to add to your Node.js project:  
+If you don't know how to create the `package.json` file, just copy the sample one from `./plugins/nodejs-mobile-cordova/install/sample-project/www/nodejs-project/package.json`.
+Then proceed with the installation of the Node modules you want to add to your Node.js project:
 ```
 $ cd www/nodejs-project/
 $ npm install module-name
 ```
 
-Rebuild your Cordova project so that the newly added Node modules are added to the Cordova application.  
+Rebuild your Cordova project so that the newly added Node modules are added to the Cordova application.
 
-On Android, the project files and the Node modules need to be extracted from the APK assets in order to make them available to the Node.js for Mobile Apps engine. They are extracted from the APK and copied to a working folder (`context.getFilesDir().getAbsolutePath() + "/www/nodejs-project/"`) when the application is launched for the first time or a new version of the application has been installed.  
-Given the project folder will be overwritten after each application update, it should not be used for persistent data storage.  
-To expedite the process of extracting the assets files, instead of parsing the assets hierarchy, a list of files `file.list` and a list of folders `dir.list` are created when the application is compiled and then added to the application assets. On Android 6.x and older versions, this allows to work around a serious perfomance bug in the Android assets manager.  
+On Android, the plugin extracts the project files and the Node modules from the APK assets in order to make them available to the Node.js for Mobile Apps engine. They are extracted from the APK and copied to a working folder (`context.getFilesDir().getAbsolutePath() + "/www/nodejs-project/"`) when the application is launched for the first time or a new version of the application has been installed.
+Given the project folder will be overwritten after each application update, it should not be used for persistent data storage.
+To expedite the process of extracting the assets files, instead of parsing the assets hierarchy, a list of files `file.list` and a list of folders `dir.list` are created when the application is compiled and then added to the application assets. On Android 6.x and older versions, this allows to work around a serious perfomance bug in the Android assets manager.
 
 ### Native Modules
 
@@ -246,7 +246,7 @@ On Linux and macOS, there is experimental support for building modules that cont
 
 The plugin automatically detects native modules in `./www/nodejs-project/` by searching for `.gyp` files. It's recommended to have the build prerequisites mentioned in `nodejs-mobile` for [Android](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-android-library-on-linux-ubuntudebian) and [iOS](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-ios-framework-library-on-macos). For Android it's also recommended that you set the `ANDROID_NDK_HOME` environment variable in your system.
 
-Building native modules can take a long time for Android, since it depends on building a standalone NDK toolchain for each required architecture. The resulting `.node` binaries are then included in the final application in a separate asset path for each architecture and the correct one will be chosen at runtime.
+Building native modules for Android can take a long time, since it depends on building a standalone NDK toolchain for each required architecture. The resulting `.node` binaries are then included in the final application in a separate asset path for each architecture and the correct one will be chosen at runtime.
 
 While the plugin tries to detect automatically the presence of native modules, there's a way to override this detection and turn the native modules build process on or off, by setting the environment variable `NODEJS_MOBILE_BUILD_NATIVE_MODULES` to `1` or `0`, respectively. This can also be done by starting the application like this:
 ```sh
