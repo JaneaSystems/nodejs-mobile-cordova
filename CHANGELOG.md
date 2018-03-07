@@ -6,12 +6,23 @@
 </tr>
 <tr>
 <td>
+<a href="#0.1.4">0.1.4</a><br/>
 <a href="#0.1.3">0.1.3</a><br/>
 <a href="#0.1.2">0.1.2</a><br/>
 <a href="#0.1.1">0.1.1</a><br/>
 </td>
 </tr>
 </table>
+
+<a id="0.1.4"></a>
+## Version 0.1.4 - Mar 07 2018
+
+### Notable Changes
+ - Hotfixes release.
+
+### Commits
+ - [[`c723064`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/c7230644e2ba7f0a2bce139ee5ecf5f9b98c7c15)] - android: build node assets lists after prepare (Jaime Bernardo)
+ - [[`22e5f9f`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/22e5f9ff95d3b185f8ff747a490d0f0e2ad95838)] - android: remove version settings from gradle file (Jaime Bernardo)
 
 <a id="0.1.3"></a>
 ## Version 0.1.3 - Mar 05 2018
