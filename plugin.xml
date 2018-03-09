@@ -18,6 +18,10 @@
     <clobbers target="nodejs" />
   </js-module>
 
+  <js-module src="www/nodejs_events.js" name="nodejs_events">
+    <clobbers target="nodejs_events" />
+  </js-module>
+
   <!-- ios -->
   <platform name="ios">
 

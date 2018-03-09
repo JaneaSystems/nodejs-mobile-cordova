@@ -53,10 +53,11 @@ public class NodeJS extends CordovaPlugin {
 
   private static boolean appPaused = false;
   private static String LOGTAG = "NODEJS-CORDOVA";
+  private static String SYSTEM_CHANNEL = "_SYSTEM_";
 
   private static boolean engineAlreadyStarted = false;
 
-  private static CallbackContext channelListenerContext = null;
+  private static CallbackContext allChannelListenerContext = null;
 
   static {
     System.loadLibrary("nodejs-mobile-cordova-native-lib");
@@ -64,7 +65,7 @@ public class NodeJS extends CordovaPlugin {
   }
 
   public native Integer startNodeWithArguments(String[] arguments, String nodePath, boolean redirectOutputToLogcat);
-  public native void sendToNode(String msg);
+  public native void sendMessageToNodeChannel(String channelName, String msg);
   public native String getCurrentABIName();
 
   @Override
@@ -116,10 +117,11 @@ public class NodeJS extends CordovaPlugin {
   @Override
   public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
     if (action.equals("sendMessageToNode")) {
-      String msg = data.getString(0);
-      this.sendMessageToNode(msg);
-    } else if (action.equals("setChannelListener")) {
-      this.setChannelListener(callbackContext);
+      String channelName = data.getString(0);
+      String msg = data.getString(1);
+      this.sendMessageToNode(channelName, msg);
+    } else if (action.equals("setAllChannelsListener")) {
+      this.setAllChannelsListener(callbackContext);
     } else if (action.equals("startEngine")) {
       String target = data.getString(0);
       JSONObject startOptions = data.getJSONObject(1);
@@ -140,7 +142,7 @@ public class NodeJS extends CordovaPlugin {
   public void onPause(boolean multitasking) {
     super.onPause(multitasking);
     Log.d(LOGTAG, "onPause");
-    // (todo) add call to node land through JNI method
+    sendMessageToNodeChannel(SYSTEM_CHANNEL, "pause");
     appPaused = true;
   }
 
@@ -148,30 +150,35 @@ public class NodeJS extends CordovaPlugin {
   public void onResume(boolean multitasking) {
     super.onResume(multitasking);
     Log.d(LOGTAG, "onResume");
-    // (todo) add call to node land through JNI method
+    sendMessageToNodeChannel(SYSTEM_CHANNEL, "resume");
     appPaused = false;
   }
 
-  private void sendMessageToNode(String msg) {
-    Log.d(LOGTAG, "sendMessageToNode: " + msg);
-    sendToNode(msg);
+  private boolean sendMessageToNode(String channelName, String msg) {
+    sendMessageToNodeChannel(channelName, msg);
+    return true;
   }
 
-  public static void sendMessageToCordova(String msg) {
+  public static void sendMessageToCordova(String channelName, String msg) {
+    final String channel = new String(channelName);
     final String message = new String(msg);
     NodeJS.activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, message);
+        JSONArray args = new JSONArray();
+        args.put(channel);
+        args.put(message);
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, args);
         pluginResult.setKeepCallback(true);
-        NodeJS.channelListenerContext.sendPluginResult(pluginResult);
+        NodeJS.allChannelListenerContext.sendPluginResult(pluginResult);
       }
     });
   }
 
-  private void setChannelListener(final CallbackContext callbackContext) {
-    Log.d(LOGTAG, "setChannelListener");
-    NodeJS.channelListenerContext = callbackContext;
+  private boolean setAllChannelsListener(final CallbackContext callbackContext) {
+    Log.v(LOGTAG, "setAllChannelsListener");
+    NodeJS.allChannelListenerContext = callbackContext;
+    return true;
   }
 
   private void startEngine(final String scriptFileName, final JSONObject startOptions,

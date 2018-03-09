@@ -25,12 +25,15 @@ JNIEnv* cacheEnvPointer = NULL;
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_janeasystems_cdvnodejsmobile_NodeJS_sendToNode(
+Java_com_janeasystems_cdvnodejsmobile_NodeJS_sendMessageToNodeChannel(
     JNIEnv *env,
     jobject /* this */,
+    jstring channelName,
     jstring msg) {
+  const char* nativeChannelName = env->GetStringUTFChars(channelName, 0);
   const char* nativeMessage = env->GetStringUTFChars(msg, 0);
-  SendToNode(nativeMessage);
+  SendMessageToNodeChannel(nativeChannelName, nativeMessage);
+  env->ReleaseStringUTFChars(channelName, nativeChannelName);
   env->ReleaseStringUTFChars(msg, nativeMessage);
 }
 
@@ -59,20 +62,23 @@ Java_com_janeasystems_cdvnodejsmobile_NodeJS_getCurrentABIName(
     return env->NewStringUTF(CURRENT_ABI_NAME);
 }
 
-void rcv_message_from_node(const char* msg) {
+void rcv_message_from_node(const char* channel_name, const char* msg) {
   JNIEnv *env = cacheEnvPointer;
   if (!env) {
-      return;
+    return;
   }
   // Try to find the class.
   jclass cls2 = env->FindClass("com/janeasystems/cdvnodejsmobile/NodeJS");
   if (cls2 != nullptr) {
-    // Find the method.
-    jmethodID m_sendMessage = env->GetStaticMethodID(cls2, "sendMessageToCordova", "(Ljava/lang/String;)V");
+    // Find the method
+    jmethodID m_sendMessage = env->GetStaticMethodID(cls2,
+                                                     "sendMessageToCordova",
+                                                     "(Ljava/lang/String;Ljava/lang/String;)V");
     if (m_sendMessage != nullptr) {
+      jstring java_channel_name=env->NewStringUTF(channel_name);
       jstring java_msg=env->NewStringUTF(msg);
       // Call the method.
-      env->CallStaticVoidMethod(cls2, m_sendMessage, java_msg);
+      env->CallStaticVoidMethod(cls2, m_sendMessage, java_channel_name, java_msg);
     }
   }
 }

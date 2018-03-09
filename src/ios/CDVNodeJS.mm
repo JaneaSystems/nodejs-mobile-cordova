@@ -19,19 +19,25 @@
 
 static CDVNodeJS* activeInstance = nil;
 
+const char* SYSTEM_CHANNEL = "_SYSTEM_";
+
 @implementation CDVNodeJS
 
 /**
  * A method that can be called from the C++ Node native module (i.e. cordova-bridge.ccp).
  */
-void sendMessageToCordova(const char* msg) {
-  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithUTF8String:msg]];
+void sendMessageToCordova(const char* channelName, const char* msg) {
+  NSMutableArray* arguments = [NSMutableArray array];
+  [arguments addObject: [NSString stringWithUTF8String:channelName]];
+  [arguments addObject: [NSString stringWithUTF8String:msg]];
+
+  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:arguments];
   [pluginResult setKeepCallbackAsBool:TRUE];
-  [activeInstance.commandDelegate sendPluginResult:pluginResult callbackId:activeInstance.messageListenerCallbackId];
+  [activeInstance.commandDelegate sendPluginResult:pluginResult callbackId:activeInstance.allChannelsListenerCallbackId];
 }
 
 // The callback id of the Cordova channel listener
-NSString* messageListenerCallbackId = nil;
+NSString* allChannelsListenerCallbackId = nil;
 
 + (CDVNodeJS*) activeInstance {
   return activeInstance;
@@ -102,27 +108,29 @@ NSString* messageListenerCallbackId = nil;
 
 - (void) onPause {
   LOG_FN
+  SendMessageToNodeChannel(SYSTEM_CHANNEL, "pause");
 }
 
 - (void) onResume {
   LOG_FN
+  SendMessageToNodeChannel(SYSTEM_CHANNEL, "resume");
 }
 
 /**
- * Methods available to be called by the cordova layer using 'cordova.exec'.
+ * Methods available to be called by the Cordova layer using 'cordova.exec'.
  */
 
-- (void) setChannelListener:(CDVInvokedUrlCommand*)command
+- (void) setAllChannelsListener:(CDVInvokedUrlCommand*)command
 {
   LOG_FN
-
-  self.messageListenerCallbackId = command.callbackId;
+  self.allChannelsListenerCallbackId = command.callbackId;
 }
 
 - (void) sendMessageToNode:(CDVInvokedUrlCommand*)command {
-  NSString* msg = [command argumentAtIndex:0];
-  // Call the native module API
-  SendToNode((const char*)[msg UTF8String]);
+  NSString* channelName = [command argumentAtIndex:0];
+  NSString* msg = [command argumentAtIndex:1];
+  // Call the Node bridge API
+  SendMessageToNodeChannel((const char*)[channelName UTF8String], (const char*)[msg UTF8String]);
 }
 
 - (void) startEngine:(CDVInvokedUrlCommand*)command {

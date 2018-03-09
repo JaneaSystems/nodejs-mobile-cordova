@@ -7,8 +7,8 @@
 #ifndef CORDOVA_BRIDGE_H_
 #define CORDOVA_BRIDGE_H_
 
-typedef void (*t_bridge_callback)(const char* arg);
+typedef void (*t_bridge_callback)(const char* channelName, const char* message);
 void RegisterBridgeCallback(t_bridge_callback);
-void SendToNode(const char *message);
+void SendMessageToNodeChannel(const char* channelName, const char* message);
 
 #endif

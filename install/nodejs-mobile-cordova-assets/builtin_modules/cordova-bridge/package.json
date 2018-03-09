@@ -1,6 +1,6 @@
 {
   "name": "cordova-bridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Node.js for Mobile Apps Native Bridge",
   "main": "index.js",
   "scripts": {

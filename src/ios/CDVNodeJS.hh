@@ -9,11 +9,11 @@
 @interface CDVNodeJS : CDVPlugin
 {}
 
-@property NSString* messageListenerCallbackId;
+@property NSString* allChannelsListenerCallbackId;
 
 + (CDVNodeJS*) activeInstance;
 
-- (void) setChannelListener:(CDVInvokedUrlCommand*)command;
+- (void) setAllChannelsListener:(CDVInvokedUrlCommand*)command;
 
 - (void) sendMessageToNode:(CDVInvokedUrlCommand*)command;
 
