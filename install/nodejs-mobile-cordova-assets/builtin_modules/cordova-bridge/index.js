@@ -17,7 +17,7 @@ const EVENT_CHANNEL = '_EVENTS_';
 const SYSTEM_CHANNEL = '_SYSTEM_';
 
 /**
- * This classes is defined in www/nodejs-apis.js as well.
+ * This class is defined in www/nodejs-apis.js as well.
  * Any change made here should be ported to www/nodejs-apis.js too.
  * The MessageCodec class provides two static methods to serialize/deserialize
  * the data sent through the events channel.

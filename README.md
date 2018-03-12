@@ -27,13 +27,17 @@ $ export ANDROID_NDK_HOME=/Users/username/Library/Android/sdk/ndk-bundle
 We have a [central repo](https://github.com/janeasystems/nodejs-mobile/issues) where we manage all the issues related to Node.js for Mobile Apps, including specific issues of the Node.js for Mobile Apps Cordova plugin.
 So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/issues).
 
-## Cordova Methods
+## Methods available in the Cordova layer
 
+These methods can be called from the Cordova javascript code directly:
 - `nodejs.start`
 - `nodejs.startWithScript`
+- `nodejs.channel.on`
+- `nodejs.channel.post`
 - `nodejs.channel.setListener`
 - `nodejs.channel.send`
 
+> `nodejs.channel.setListener(callback)` is equivalent to `nodejs.channel.on('message',callback)` and `nodejs.channel.send(msg)` is equivalent to `nodejs.channel.post('message',msg)`. They are maintained for backward compatibility purposes.
 
 ### nodejs.start
 
@@ -46,6 +50,7 @@ So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/
 | callback | <code>function</code>  |
 | options | <code>[StartupOptions](#cordova.StartupOptions)</code>  |
 
+Starts the nodejs-mobile runtime thread with a file inside the `nodejs-project` directory.
 
 ### nodejs.startWithScript
 
@@ -58,6 +63,32 @@ So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/
 | callback | <code>function</code>  |
 | options | <code>[StartupOptions](#cordova.StartupOptions)</code>  |
 
+Starts the nodejs-mobile runtime thread with a script body.
+
+### nodejs.channel.on
+
+```js
+  nodejs.channel.on(event, callback);
+```
+| Param | Type |
+| --- | --- |
+| event | <code>string</code> |
+| callback | <code>[function](#cordova.channelCallback)</code> |
+
+Registers a callback for user-defined events raised from the nodejs-mobile side.
+
+### nodejs.channel.post
+
+```js
+  nodejs.channel.post(event, message);
+```
+| Param | Type |
+| --- | --- |
+| event | <code>string</code> |
+| message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
+
+Raises a user-defined event on the nodejs-mobile side.
+
 ### nodejs.channel.setListener
 
 ```js
@@ -65,7 +96,10 @@ So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/
 ```
 | Param | Type |
 | --- | --- |
-| listenerCallback | <code>function</code> |
+| listenerCallback | <code>[function](#cordova.channelCallback)</code> |
+
+Registers a callback for 'message' events raised from the nodejs-mobile side.
+It is an alias for `nodejs.channel.on('message', listenerCallback);`.
 
 ### nodejs.channel.send
 
@@ -74,7 +108,10 @@ So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/
 ```
 | Param | Type |
 | --- | --- |
-| message | <code>string</code> |
+| message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
+
+Raises a 'message' event on the nodejs-mobile side.
+It is an alias for `nodejs.channel.post('message', message);`.
 
 <a name="cordova.StartupOptions"></a>
 ### StartupOptions: <code>object</code>
@@ -85,14 +122,47 @@ So please, open the issue [there](https://github.com/janeasystems/nodejs-mobile/
 Note: the stdout/stderr redirection is applied to the whole application, the side effect is that some undesired/duplicated output may appear in the logcat.
 For example, the Chromium console output `I/chromium: [INFO:CONSOLE(xx)]` is also sent to stderr and will show up in logcat has well, with the `NODEJS-MOBILE` log tag.
 
-## Node.js Methods
+## Methods available in the Node layer
 
+The following methods can be called from the Node javascript code through the `cordova-bridge` module:
 ```js
   var cordova = require('cordova-bridge');
 ```
 
-- `cordova.channel.send`
 - `cordova.channel.on`
+- `cordova.channel.post`
+- `cordova.channel.send`
+
+> `cordova.channel.send(msg)` is equivalent to `cordova.channel.post('message',msg)`. It is maintained for backward compatibility purposes.
+
+### cordova.channel.on
+
+```js
+  cordova.channel.on(event, callback);
+```
+| Param | Type |
+| --- | --- |
+| event | <code>string</code> |
+| callback | <code>[function](#cordova.channelCallback)</code> |
+
+Registers a callback for user-defined events raised from the cordova side.
+
+> To receive messages from `nodejs.channel.send`, use:
+> ```js
+>   cordova.channel.on('message', listenerCallback);
+> ```
+
+### cordova.channel.post
+
+```js
+  cordova.channel.post(event, message);
+```
+| Param | Type |
+| --- | --- |
+| event | <code>string</code> |
+| message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
+
+Raises a user-defined event on the cordova side.
 
 ### cordova.channel.send
 
@@ -101,17 +171,20 @@ For example, the Chromium console output `I/chromium: [INFO:CONSOLE(xx)]` is als
 ```
 | Param | Type |
 | --- | --- |
-| message | <code>string</code> |
+| message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
 
-### cordova.channel.on
+Raises a 'message' event on the cordova side.
+It is an alias for `cordova.channel.post('message', message);`.
 
-```
- cordova.channel.on('message', listenerCallback);
-```
-| Param | Type |
+<a name="cordova.channelCallback"></a>
+### Channel callback: <code>function(arg)</code>
+| Name | Type |
 | --- | --- |
-| 'message' | <code>const string</code> |
-| listenerCallback | <code>function</code> |
+| arg | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
+
+The messages sent through the channel can be of any type that can be correctly serialized with [`JSON.stringify`](https://www.w3schools.com/js/js_json_stringify.asp) on one side and deserialized with [`JSON.parse`](https://www.w3schools.com/js/js_json_parse.asp) on the other side, as it is what the channel does internally. This means that passing JS dates through the channel will convert them to strings and functions will be removed from their containing objects. In line with [The JSON Data Interchange Syntax Standard](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf), the channel supports sending messages that are composed of these JS types: `Boolean`, `Number`, `String`, `Object`, `Array`.
+
+
 
 ## Usage
 
@@ -122,8 +195,9 @@ $ cordova create HelloCordova
 $ cd HelloCordova
 $ cordova platform add ios
 $ cordova plugin add nodejs-mobile-cordova
+$ cordova plugin add cordova-plugin-console
 ```
-You can either manually create the `./www/nodejs-project/` folder, the `./www/nodejs-project/main.js` file and edit `./www/js/index.js` or use the provided helper script to do it automatically.
+You can either manually create the `./www/nodejs-project/` folder, the `./www/nodejs-project/main.js` file and edit `./www/js/index.js` or use the provided helper script to do it automatically. The helper script copies a more extended sample compared to the one provided with the manual steps.
 
 ---
 #### Set up project files using the helper script
@@ -213,12 +287,24 @@ $ cordova build ios --device
 Switch to Xcode:
  * select a target device for the project
  * run the project
- * enlarge the `Console` area, at the end of the console log it should show:
+ * enlarge the `Console` area and scroll to the bottom
 
+ If you created the project following the manual steps, the output will look like this:
 ```bash
 2017-10-02 18:49:18.606100+0200 HelloCordova[2182:1463518] Node.js Mobile Engine Started
 [node] received: Hello from Cordova!
 2017-10-02 18:49:18.690132+0200 HelloCordova[2182:1463518] [cordova] received: Replying to this message: Hello from Cordova!
+```
+
+If you used the helper script, the output will look like this:
+```
+2018-02-26 09:18:21.178612+0100 HelloCordova[1089:957630] Node.js Mobile Engine started
+2018-02-26 09:18:21.385605+0100 HelloCordova[1089:957630] [cordova] MESSAGE from Node: "main.js loaded"
+2018-02-26 09:18:21.385760+0100 HelloCordova[1089:957630] [cordova] "STARTED" event received from Node
+2018-02-26 09:18:21.385831+0100 HelloCordova[1089:957630] [cordova] "STARTED" event received from Node with a message: "main.js loaded"
+[node] MESSAGE received: "Hello from Cordova!"
+[node] MYEVENT received with message: "An event from Cordova"
+2018-02-26 09:18:21.392035+0100 HelloCordova[1089:957630] [cordova] MESSAGE from Node: "Message received!" - In reply to: "Hello from Cordova!"
 ```
 
 ## Node Modules
