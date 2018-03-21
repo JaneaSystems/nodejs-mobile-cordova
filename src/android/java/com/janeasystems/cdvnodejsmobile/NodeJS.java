@@ -19,6 +19,8 @@ import android.content.res.AssetManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.SharedPreferences;
+import android.system.Os;
+import android.system.ErrnoException;
 
 import java.io.*;
 import java.lang.System;
@@ -66,6 +68,7 @@ public class NodeJS extends CordovaPlugin {
 
   public native Integer startNodeWithArguments(String[] arguments, String nodePath, boolean redirectOutputToLogcat);
   public native void sendMessageToNodeChannel(String channelName, String msg);
+  public native void registerNodeDataDirPath(String dataDir);
   public native String getCurrentABIName();
 
   @Override
@@ -76,7 +79,17 @@ public class NodeJS extends CordovaPlugin {
     context = activity.getBaseContext();
     assetManager = activity.getBaseContext().getAssets();
 
+    // Sets the TMPDIR environment to the cacheDir, to be used in Node as os.tmpdir
+    try {
+      Os.setenv("TMPDIR", context.getCacheDir().getAbsolutePath(),true);
+    } catch (ErrnoException e) {
+      e.printStackTrace();
+    }
     filesDir = context.getFilesDir().getAbsolutePath();
+
+    // Register the filesDir as the Node data dir.
+    registerNodeDataDirPath(filesDir);
+
     nodeAppRootAbsolutePath = filesDir + "/" + PROJECT_ROOT;
     nodePath = nodeAppRootAbsolutePath + ":" + filesDir + "/" + BUILTIN_MODULES;
     trashDir = filesDir + "/" + TRASH_DIR;

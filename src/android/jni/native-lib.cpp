@@ -37,6 +37,17 @@ Java_com_janeasystems_cdvnodejsmobile_NodeJS_sendMessageToNodeChannel(
   env->ReleaseStringUTFChars(msg, nativeMessage);
 }
 
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_janeasystems_cdvnodejsmobile_NodeJS_registerNodeDataDirPath(
+    JNIEnv *env,
+    jobject /* this */,
+    jstring dataDir) {
+  const char* nativeDataDir = env->GetStringUTFChars(dataDir, 0);
+  RegisterNodeDataDirPath(nativeDataDir);
+  env->ReleaseStringUTFChars(dataDir, nativeDataDir);
+}
+
 extern "C" int callintoNode(int argc, char *argv[]){
   const int exit_code = node::Start(argc,argv);
   return exit_code;

@@ -10,5 +10,6 @@
 typedef void (*t_bridge_callback)(const char* channelName, const char* message);
 void RegisterBridgeCallback(t_bridge_callback);
 void SendMessageToNodeChannel(const char* channelName, const char* message);
+void RegisterNodeDataDirPath(const char* path);
 
 #endif

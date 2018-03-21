@@ -96,6 +96,18 @@ void RegisterBridgeCallback(t_bridge_callback callback) {
   cordova_callback = callback;
 }
 
+char* datadir_path = NULL;
+/*
+ * Called by the Cordova plug-in to register the datadir,
+ * representing a writable path. Expected to be called once,
+ * while the plug-in initializes.
+ */
+void RegisterNodeDataDirPath(const char* path) {
+  size_t pathLength = strlen(path);
+  datadir_path = (char*)calloc(sizeof(char), pathLength + 1);
+  strncpy(datadir_path, path, pathLength);
+}
+
 /**
  * Channel class
  */
@@ -309,6 +321,17 @@ napi_value Method_RegisterChannel(napi_env env, napi_callback_info info) {
   return nullptr;
 }
 
+/**
+ * Get the registered datadir
+ */
+napi_value Method_GetDataDir(napi_env env, napi_callback_info info) {
+  NAPI_ASSERT(env, datadir_path!=NULL, "Data directory not set from native side.");
+  napi_value return_datadir;
+  size_t str_len = strlen(datadir_path);
+  NAPI_CALL(env, napi_create_string_utf8(env, datadir_path, str_len, &return_datadir));
+  return return_datadir;
+}
+
 #define DECLARE_NAPI_METHOD(name, func) { name, 0, func, 0, 0, 0, napi_default, 0 }
 
 napi_value Init(napi_env env, napi_value exports) {
@@ -316,6 +339,7 @@ napi_value Init(napi_env env, napi_value exports) {
   napi_property_descriptor properties[] = {
       DECLARE_NAPI_METHOD("sendMessage", Method_SendMessage),
       DECLARE_NAPI_METHOD("registerChannel", Method_RegisterChannel),
+      DECLARE_NAPI_METHOD("getDataDir", Method_GetDataDir),
   };
   NAPI_CALL(env, napi_define_properties(env, exports, sizeof(properties) / sizeof(*properties), properties));
   return exports;

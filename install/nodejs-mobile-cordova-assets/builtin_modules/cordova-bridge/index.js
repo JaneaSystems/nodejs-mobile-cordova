@@ -103,9 +103,23 @@ class EventChannel extends ChannelSuper {
  * Emit pause/resume events when the app goes to background/foreground.
  */
 class SystemChannel extends ChannelSuper {
+  constructor(name) {
+    super(name);
+    // datadir should not change during runtime, so we cache it.
+    this._cacheDataDir = null;
+  };
+
   processData(data) {
     // The data is the event.
     this.emitWrapper(data);
+  };
+
+  // Get a writable data directory for persistent file storage.
+  datadir() {
+    if (this._cacheDataDir===null) {
+      this._cacheDataDir=NativeBridge.getDataDir();
+    }
+    return this._cacheDataDir;
   };
 };
 

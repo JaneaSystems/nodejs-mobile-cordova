@@ -62,6 +62,10 @@ NSString* allChannelsListenerCallbackId = nil;
   
   RegisterBridgeCallback(sendMessageToCordova);
 
+  // Register the Documents Directory as the node dataDir.
+  NSString* nodeDataDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+  RegisterNodeDataDirPath([nodeDataDir UTF8String]);
+
   NSString* nodePath = [[NSProcessInfo processInfo] environment][NODE_PATH];
   NSString* appPath = [[NSBundle mainBundle] bundlePath];
   NSString* builtinModulesPath = [appPath stringByAppendingString:BUILTIN_MODULES];
