@@ -39,11 +39,8 @@ These methods can be called from the Cordova javascript code directly:
 
 > `nodejs.channel.setListener(callback)` is equivalent to `nodejs.channel.on('message',callback)` and `nodejs.channel.send(msg)` is equivalent to `nodejs.channel.post('message',msg)`. They are maintained for backward compatibility purposes.
 
-### nodejs.start
+### nodejs.start(scriptFileName, callback [, options])
 
-```js
-  nodejs.start(scriptFileName, callback [, options]);
-```
 | Param | Type |
 | --- | --- |
 | scriptFileName | <code>string</code> |
@@ -52,11 +49,8 @@ These methods can be called from the Cordova javascript code directly:
 
 Starts the nodejs-mobile runtime thread with a file inside the `nodejs-project` directory.
 
-### nodejs.startWithScript
+### nodejs.startWithScript(scriptBody, callback [, options])
 
-```js
-  nodejs.startWithScript(scriptBody, callback [, options]);
-```
 | Param | Type |
 | --- | --- |
 | scriptBody | <code>string</code> |
@@ -65,11 +59,8 @@ Starts the nodejs-mobile runtime thread with a file inside the `nodejs-project` 
 
 Starts the nodejs-mobile runtime thread with a script body.
 
-### nodejs.channel.on
+### nodejs.channel.on(event, callback)
 
-```js
-  nodejs.channel.on(event, callback);
-```
 | Param | Type |
 | --- | --- |
 | event | <code>string</code> |
@@ -77,11 +68,8 @@ Starts the nodejs-mobile runtime thread with a script body.
 
 Registers a callback for user-defined events raised from the nodejs-mobile side.
 
-### nodejs.channel.post
+### nodejs.channel.post(event, message)
 
-```js
-  nodejs.channel.post(event, message);
-```
 | Param | Type |
 | --- | --- |
 | event | <code>string</code> |
@@ -89,11 +77,8 @@ Registers a callback for user-defined events raised from the nodejs-mobile side.
 
 Raises a user-defined event on the nodejs-mobile side.
 
-### nodejs.channel.setListener
+### nodejs.channel.setListener(listenerCallback)
 
-```js
-  nodejs.channel.setListener(listenerCallback);
-```
 | Param | Type |
 | --- | --- |
 | listenerCallback | <code>[function](#cordova.channelCallback)</code> |
@@ -101,11 +86,8 @@ Raises a user-defined event on the nodejs-mobile side.
 Registers a callback for 'message' events raised from the nodejs-mobile side.
 It is an alias for `nodejs.channel.on('message', listenerCallback);`.
 
-### nodejs.channel.send
+### nodejs.channel.send(message)
 
-```js
-  nodejs.channel.send(message);
-```
 | Param | Type |
 | --- | --- |
 | message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
@@ -132,14 +114,13 @@ The following methods can be called from the Node javascript code through the `c
 - `cordova.channel.on`
 - `cordova.channel.post`
 - `cordova.channel.send`
+- `cordova.app.on`
+- `cordova.app.datadir`
 
 > `cordova.channel.send(msg)` is equivalent to `cordova.channel.post('message',msg)`. It is maintained for backward compatibility purposes.
 
-### cordova.channel.on
+### cordova.channel.on(event, callback)
 
-```js
-  cordova.channel.on(event, callback);
-```
 | Param | Type |
 | --- | --- |
 | event | <code>string</code> |
@@ -152,11 +133,8 @@ Registers a callback for user-defined events raised from the cordova side.
 >   cordova.channel.on('message', listenerCallback);
 > ```
 
-### cordova.channel.post
+### cordova.channel.post(event, message)
 
-```js
-  cordova.channel.post(event, message);
-```
 | Param | Type |
 | --- | --- |
 | event | <code>string</code> |
@@ -164,17 +142,37 @@ Registers a callback for user-defined events raised from the cordova side.
 
 Raises a user-defined event on the cordova side.
 
-### cordova.channel.send
+### cordova.channel.send(message)
 
-```
- cordova.channel.send(message);
-```
 | Param | Type |
 | --- | --- |
 | message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
 
 Raises a 'message' event on the cordova side.
 It is an alias for `cordova.channel.post('message', message);`.
+
+### cordova.app.on(event, callback)
+
+| Param | Type |
+| --- | --- |
+| event | <code>string</code> |
+| callback | <code>function</code> |
+
+Registers callbacks for App events.
+Currently supports the 'pause' and 'resume' events, which are raised automatically when the app switches to the background/foreground.
+
+```js
+cordova.app.on('pause', () => {
+  console.log('[node] app paused.');
+});
+cordova.app.on('resume', () => {
+  console.log('[node] app resumed.');
+});
+```
+
+### cordova.app.datadir()
+
+Returns a writable path used for persistent data storage in the application. Its value corresponds to `NSDocumentDirectory` on iOS and `FilesDir` on Android.
 
 <a name="cordova.channelCallback"></a>
 ### Channel callback: <code>function(arg)</code>
