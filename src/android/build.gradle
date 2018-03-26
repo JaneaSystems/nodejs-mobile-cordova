@@ -195,7 +195,13 @@ if ("1".equals(shouldRebuildNativeModules)) {
             //environment ('PATH', "${npm_toolchain_add_to_path}" + System.getProperty("path.separator") + "${System.env.PATH}")
             environment ('npm_config_node_engine', 'v8' )
             environment ('npm_config_nodedir', "${project.projectDir}/src/com/janeasystems/cdvnodejsmobile/jni/libnode/" )
-            environment ('npm_config_node_gyp', "${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js" )
+            String npm_gyp_path_to_use;
+            if( file("${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
+                npm_gyp_path_to_use = "${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
+            } else {
+                npm_gyp_path_to_use = "${rootProject.projectDir}/../../node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
+            }
+            environment ('npm_config_node_gyp', npm_gyp_path_to_use)
             environment ('npm_config_arch', temp_arch)
             environment ('npm_config_platform', 'android')
             environment ('npm_config_format', 'make-android')

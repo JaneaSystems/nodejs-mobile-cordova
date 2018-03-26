@@ -24,7 +24,11 @@ if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
 fi
 if [ "1" != "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then exit 0; fi
 # Get the nodejs-mobile-gyp location
+if [ -d "$PROJECT_DIR/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/" ]; then
 NODEJS_MOBILE_GYP_DIR="$( cd "$PROJECT_DIR" && cd ../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/ && pwd )"
+else
+NODEJS_MOBILE_GYP_DIR="$( cd "$PROJECT_DIR" && cd ../../node_modules/nodejs-mobile-gyp/ && pwd )"
+fi
 NODEJS_MOBILE_GYP_BIN_FILE="$NODEJS_MOBILE_GYP_DIR"/bin/node-gyp.js
 # Rebuild modules with right environment
 NODEJS_HEADERS_DIR="$( cd "$( dirname "$PRODUCT_SETTINGS_PATH" )" && cd Plugins/nodejs-mobile-cordova/ && pwd )"
