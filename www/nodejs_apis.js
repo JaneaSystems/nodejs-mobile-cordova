@@ -32,7 +32,7 @@ class MessageCodec {
   // Deserialize the message and the message payload.
   static deserialize(message) {
     var envelope = JSON.parse(message);
-    if (envelope.payload !== undefined) {
+    if (typeof envelope.payload !== 'undefined') {
       envelope.payload = JSON.parse(envelope.payload);
     }
     return envelope;

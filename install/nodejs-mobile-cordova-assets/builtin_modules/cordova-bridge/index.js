@@ -40,7 +40,7 @@ class MessageCodec {
   // Deserialize the message and the message payload.
   static deserialize(message) {
     var envelope = JSON.parse(message);
-    if (envelope.payload !== undefined) {
+    if (typeof envelope.payload !== 'undefined') {
       envelope.payload = JSON.parse(envelope.payload);
     }
     return envelope;
@@ -65,7 +65,7 @@ class ChannelSuper extends EventEmitter {
   emitWrapper(type, msg) {
     const _this = this;
     setImmediate( () => {
-      if (msg) {
+      if (typeof msg !== 'undefined') {
         _this.emitLocal(type, msg);
       } else {
         _this.emitLocal(type);
