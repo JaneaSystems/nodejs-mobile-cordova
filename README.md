@@ -162,13 +162,27 @@ Registers callbacks for App events.
 Currently supports the 'pause' and 'resume' events, which are raised automatically when the app switches to the background/foreground.
 
 ```js
-cordova.app.on('pause', () => {
+cordova.app.on('pause', (pauseLock) => {
   console.log('[node] app paused.');
+  pauseLock.release();
 });
 cordova.app.on('resume', () => {
   console.log('[node] app resumed.');
 });
 ```
+
+The 'pause' event is raised when the application switches to the background. On iOS, the system will wait for the 'pause' event handlers to return before finally suspending the application. For the purpose of letting the iOS application know when it can safely suspend after going to the background, a `pauseLock` argument is passed to each 'pause' listener, so that `release()` can be called on it to signal that listener has finished doing all the work it needed to do. The application will only suspend after all the locks have been released (or iOS forces it to).
+
+```js
+cordova.app.on('pause', (pauseLock) => {
+  server.close( () => {
+    // App will only suspend after the server stops listening for connections and current connections are closed.
+    pauseLock.release();
+  });
+});
+```
+
+**Warning :** On iOS, the application will eventually be suspended, so the pause event should be used to run the clean up operations as quickly as possible and let the application suspend after that. Make sure to call `pauseLock.release()` in each 'pause' event listener, or your Application will keep running in the background for as long as iOS will allow it.
 
 ### cordova.app.datadir()
 

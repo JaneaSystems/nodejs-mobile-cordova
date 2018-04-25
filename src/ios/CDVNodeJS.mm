@@ -26,14 +26,44 @@ const char* SYSTEM_CHANNEL = "_SYSTEM_";
 /**
  * A method that can be called from the C++ Node native module (i.e. cordova-bridge.ccp).
  */
-void sendMessageToCordova(const char* channelName, const char* msg) {
+void sendMessageToApplication(const char* channelName, const char* msg) {
+
+  NSString* channelNameNS = [NSString stringWithUTF8String:channelName];
+  NSString* msgNS = [NSString stringWithUTF8String:msg];
+
+  if ([channelNameNS isEqualToString:[NSString stringWithUTF8String:SYSTEM_CHANNEL]]) {
+    // If it's a system channel call, handle it in the plugin native side.
+    handleAppChannelMessage(msgNS);
+  } else {
+    // Otherwise, send it to Cordova.
+    sendMessageToCordova(channelNameNS,msgNS);
+  }
+
+}
+
+void sendMessageToCordova(NSString* channelName, NSString* msg) {
   NSMutableArray* arguments = [NSMutableArray array];
-  [arguments addObject: [NSString stringWithUTF8String:channelName]];
-  [arguments addObject: [NSString stringWithUTF8String:msg]];
+  [arguments addObject: channelName];
+  [arguments addObject: msg];
 
   CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:arguments];
   [pluginResult setKeepCallbackAsBool:TRUE];
   [activeInstance.commandDelegate sendPluginResult:pluginResult callbackId:activeInstance.allChannelsListenerCallbackId];
+}
+
+void handleAppChannelMessage(NSString* msg) {
+  if([msg hasPrefix:@"release-pause-event"]) {
+    // The nodejs runtime has signaled it has finished handling a pause event.
+    NSArray *eventArguments = [msg componentsSeparatedByString:@"|"];
+    // The expected format for this message is "release-pause-event|{eventId}"
+    if (eventArguments.count >=2) {
+      // Release the received eventId.
+      [activeInstance ReleasePauseEvent:eventArguments[1]];
+    }
+  } else if ([msg isEqualToString:@"ready-for-app-events"]) {
+    // The nodejs runtime is ready for APP events.
+    nodeIsReadyForAppEvents = true;
+  }
 }
 
 // The callback id of the Cordova channel listener
@@ -59,8 +89,8 @@ NSString* allChannelsListenerCallbackId = nil;
   [[NSNotificationCenter defaultCenter] addObserver:self
                                         selector:@selector(onResume)
                                         name:UIApplicationWillEnterForegroundNotification object:nil];
-  
-  RegisterBridgeCallback(sendMessageToCordova);
+
+  RegisterBridgeCallback(sendMessageToApplication);
 
   // Register the Documents Directory as the node dataDir.
   NSString* nodeDataDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
@@ -104,6 +134,18 @@ NSString* allChannelsListenerCallbackId = nil;
   LOG_FN
 }
 
+// Flag to indicate if node is ready to receive app events.
+bool nodeIsReadyForAppEvents = false;
+
+// Condition to wait on pause event handling on the node side.
+NSCondition *appEventBeingProcessedCondition = [[NSCondition alloc] init];
+
+// Set to keep ids for called pause events, so they can be unlocked later.
+NSMutableSet* appPauseEventsManagerSet = [[NSMutableSet alloc] init];
+
+// Lock to manipulate the App Pause Events Manager Set.
+id appPauseEventsManagerSetLock = [[NSObject alloc] init];
+
 /**
  * Handlers for events registered by the plugin:
  * - onPause
@@ -112,12 +154,85 @@ NSString* allChannelsListenerCallbackId = nil;
 
 - (void) onPause {
   LOG_FN
-  SendMessageToNodeChannel(SYSTEM_CHANNEL, "pause");
+  if(nodeIsReadyForAppEvents) {
+    UIApplication *application = [UIApplication sharedApplication];
+    // Inform the app intends do run something in the background.
+    // In this case we'll try to wait for the pause event to be properly taken care of by node.
+    __block UIBackgroundTaskIdentifier backgroundWaitForPauseHandlerTask =
+      [application beginBackgroundTaskWithExpirationHandler: ^ {
+        // Expiration handler to avoid app crashes if the task doesn't end in the iOS allowed background duration time.
+        [application endBackgroundTask: backgroundWaitForPauseHandlerTask];
+        backgroundWaitForPauseHandlerTask = UIBackgroundTaskInvalid;
+      }];
+
+    NSTimeInterval intendedMaxDuration = [application backgroundTimeRemaining]+1;
+    // Calls the event in a background thread, to let this UIApplicationDidEnterBackgroundNotification
+    // return as soon as possible.
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      NSDate * targetMaximumFinishTime = [[NSDate date] dateByAddingTimeInterval:intendedMaxDuration];
+      // We should block the thread at most until a bit (1 second) after the maximum allowed background time.
+      // The background task will be ended by the expiration handler, anyway.
+      // SendPauseEventAndWaitForRelease won't return until the node runtime notifies it has finished its pause event (or the target time is reached).
+      [self SendPauseEventAndWaitForRelease:targetMaximumFinishTime];
+      // After SendPauseEventToNodeChannel returns, clean up the background task and let the Application enter the suspended state.
+      [application endBackgroundTask: backgroundWaitForPauseHandlerTask];
+      backgroundWaitForPauseHandlerTask = UIBackgroundTaskInvalid;
+    });
+  }
 }
 
 - (void) onResume {
   LOG_FN
-  SendMessageToNodeChannel(SYSTEM_CHANNEL, "resume");
+  if(nodeIsReadyForAppEvents) {
+    SendMessageToNodeChannel(SYSTEM_CHANNEL, "resume");
+  }
+}
+
+// Sends the pause event to the node runtime and returns only after node signals
+// the event has been handled explicitely or the background time is running out.
+- (void) SendPauseEventAndWaitForRelease:(NSDate*)expectedFinishTime {
+  // Get unique identifier for this pause event.
+  NSString * eventId = [[NSUUID UUID] UUIDString];
+  // Create the pause event message with the id.
+  NSString * event = [NSString stringWithFormat:@"pause|%@", eventId];
+
+  [appEventBeingProcessedCondition lock];
+
+  @synchronized(appPauseEventsManagerSetLock) {
+    [appPauseEventsManagerSet addObject:eventId];
+  }
+
+  SendMessageToNodeChannel(SYSTEM_CHANNEL, (const char*)[event UTF8String]);
+
+  while (YES) {
+    // Looping to avoid unintended spurious wake ups.
+    @synchronized(appPauseEventsManagerSetLock) {
+      if(![appPauseEventsManagerSet containsObject:eventId]) {
+        // The Id for this event has been released.
+        break;
+      }
+    }
+    if([expectedFinishTime timeIntervalSinceNow] <= 0) {
+      // We blocked the background thread long enough.
+      break;
+    }
+    [appEventBeingProcessedCondition waitUntilDate:expectedFinishTime];
+  }
+  [appEventBeingProcessedCondition unlock];
+
+  @synchronized(appPauseEventsManagerSetLock) {
+    [appPauseEventsManagerSet removeObject:eventId];
+  }
+}
+
+// Signals the pause event has been handled by the node side.
+- (void) ReleasePauseEvent:(NSString*)eventId {
+  [appEventBeingProcessedCondition lock];
+  @synchronized(appPauseEventsManagerSetLock) {
+    [appPauseEventsManagerSet removeObject:eventId];
+  }
+  [appEventBeingProcessedCondition broadcast];
+  [appEventBeingProcessedCondition unlock];
 }
 
 /**

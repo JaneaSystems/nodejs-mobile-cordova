@@ -53,13 +53,15 @@ public class NodeJS extends CordovaPlugin {
   private static boolean initCompleted = false;
   private static IOException ioe = null;
 
-  private static boolean appPaused = false;
   private static String LOGTAG = "NODEJS-CORDOVA";
   private static String SYSTEM_CHANNEL = "_SYSTEM_";
 
   private static boolean engineAlreadyStarted = false;
 
   private static CallbackContext allChannelListenerContext = null;
+
+  // Flag to indicate if node is ready to receive app events.
+  private static boolean nodeIsReadyForAppEvents = false;
 
   static {
     System.loadLibrary("nodejs-mobile-cordova-native-lib");
@@ -155,21 +157,33 @@ public class NodeJS extends CordovaPlugin {
   public void onPause(boolean multitasking) {
     super.onPause(multitasking);
     Log.d(LOGTAG, "onPause");
-    sendMessageToNodeChannel(SYSTEM_CHANNEL, "pause");
-    appPaused = true;
+    if (nodeIsReadyForAppEvents) {
+      sendMessageToNodeChannel(SYSTEM_CHANNEL, "pause");
+    }
   }
 
   @Override
   public void onResume(boolean multitasking) {
     super.onResume(multitasking);
     Log.d(LOGTAG, "onResume");
-    sendMessageToNodeChannel(SYSTEM_CHANNEL, "resume");
-    appPaused = false;
+    if (nodeIsReadyForAppEvents) {
+      sendMessageToNodeChannel(SYSTEM_CHANNEL, "resume");
+    }
   }
 
   private boolean sendMessageToNode(String channelName, String msg) {
     sendMessageToNodeChannel(channelName, msg);
     return true;
+  }
+
+  public static void sendMessageToApplication(String channelName, String msg) {
+    if (channelName.equals(SYSTEM_CHANNEL)) {
+      // If it's a system channel call, handle it in the plugin native side.
+      handleAppChannelMessage(msg);
+    } else {
+      // Otherwise, send it to Cordova.
+      sendMessageToCordova(channelName, msg);
+    }
   }
 
   public static void sendMessageToCordova(String channelName, String msg) {
@@ -186,6 +200,12 @@ public class NodeJS extends CordovaPlugin {
         NodeJS.allChannelListenerContext.sendPluginResult(pluginResult);
       }
     });
+  }
+
+  public static void handleAppChannelMessage(String msg) {
+    if (msg.equals("ready-for-app-events")) {
+      nodeIsReadyForAppEvents=true;
+    }
   }
 
   private boolean setAllChannelsListener(final CallbackContext callbackContext) {

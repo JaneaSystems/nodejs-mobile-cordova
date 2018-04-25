@@ -83,7 +83,7 @@ void rcv_message_from_node(const char* channel_name, const char* msg) {
   if (cls2 != nullptr) {
     // Find the method
     jmethodID m_sendMessage = env->GetStaticMethodID(cls2,
-                                                     "sendMessageToCordova",
+                                                     "sendMessageToApplication",
                                                      "(Ljava/lang/String;Ljava/lang/String;)V");
     if (m_sendMessage != nullptr) {
       jstring java_channel_name=env->NewStringUTF(channel_name);
