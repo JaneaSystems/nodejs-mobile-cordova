@@ -6,7 +6,7 @@ const NativeBridge = process.binding('cordova_bridge');
 /**
  * Built-in events channel to exchange events between the Cordova app
  * and the Node.js app. It allows to emit user defined event types with
- * an optional message.
+ * optional arguments.
  */
 const EVENT_CHANNEL = '_EVENTS_';
 
@@ -25,14 +25,14 @@ const SYSTEM_CHANNEL = '_SYSTEM_';
 class MessageCodec {
   // This is a 'private' constructor, should only be used by this class
   // static methods.
-  constructor(_event, _payload) {
+  constructor(_event, ..._payload) {
     this.event = _event;
     this.payload = JSON.stringify(_payload);
   };
 
   // Serialize the message payload and the message.
-  static serialize(event, payload) {
-    const envelope = new MessageCodec(event, payload);
+  static serialize(event, ...payload) {
+    const envelope = new MessageCodec(event, ...payload);
     // Return the serialized message, that can be sent through a channel.
     return JSON.stringify(envelope);
   };
@@ -62,39 +62,35 @@ class ChannelSuper extends EventEmitter {
     delete this.emit;
   };
 
-  emitWrapper(type, msg) {
+  emitWrapper(type, ...msg) {
     const _this = this;
     setImmediate( () => {
-      if (typeof msg !== 'undefined') {
-        _this.emitLocal(type, msg);
-      } else {
-        _this.emitLocal(type);
-      }
+      _this.emitLocal(type, ...msg);
      });
   };
 };
 
 /**
  * Events channel class that supports user defined event types with
- * an optional message. Allows to send any serializable
+ * optional arguments. Allows to send any serializable
  * JavaScript object supported by 'JSON.stringify()'.
  * Sending functions is not currently supported.
  * Includes the previously available 'send' method for 'message' events.
  */
 class EventChannel extends ChannelSuper {
-  post(event, msg) {
-    NativeBridge.sendMessage(this.name, MessageCodec.serialize(event, msg));
+  post(event, ...msg) {
+    NativeBridge.sendMessage(this.name, MessageCodec.serialize(event, ...msg));
   };
 
   // Posts a 'message' event, to be backward compatible with old code.
-  send(msg) {
-    this.post('message',msg);
+  send(...msg) {
+    this.post('message', ...msg);
   };
 
   processData(data) {
     // The data contains the serialized message envelope.
     var envelope = MessageCodec.deserialize(data);
-    this.emitWrapper(envelope.event, envelope.payload);
+    this.emitWrapper(envelope.event, ...(envelope.payload));
   };
 };
 

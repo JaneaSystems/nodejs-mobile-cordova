@@ -17,14 +17,14 @@ var channels = {};
 class MessageCodec {
   // This is a 'private' constructor, should only be used by this class
   // static methods.
-  constructor(_event, _payload) {
+  constructor(_event, ..._payload) {
     this.event = _event;
     this.payload = JSON.stringify(_payload);
   };
 
   // Serialize the message payload and the message.
-  static serialize(event, payload) {
-    const envelope = new MessageCodec(event, payload);
+  static serialize(event, ...payload) {
+    const envelope = new MessageCodec(event, ...payload);
     // Return the serialized message, that can be sent through a channel.
     return JSON.stringify(envelope);
   };
@@ -57,19 +57,19 @@ class ChannelSuper extends EventEmitter {
 
 /**
  * Events channel class that supports user defined event types with
- * an optional message. Allows to send any serializable
+ * optional arguments. Allows to send any serializable
  * JavaScript object supported by 'JSON.stringify()'.
  * Sending functions is not currently supported.
  * Includes the previously available 'send' method for 'message' events.
  */
 class EventChannel extends ChannelSuper {
-  post(event, msg) {
-    cordova.exec(null, null, 'NodeJS', 'sendMessageToNode', [this.name, MessageCodec.serialize(event, msg)]);
+  post(event, ...msg) {
+    cordova.exec(null, null, 'NodeJS', 'sendMessageToNode', [this.name, MessageCodec.serialize(event, ...msg)]);
   };
 
   // Posts a 'message' event, to be backward compatible with old code.
-  send(msg) {
-    this.post('message',msg);
+  send(...msg) {
+    this.post('message', ...msg);
   };
 
   // Sets a listener on the 'message' event, to be backward compatible with old code.
@@ -80,7 +80,7 @@ class EventChannel extends ChannelSuper {
   processData(data) {
     // The data contains the serialized message envelope.
     var envelope = MessageCodec.deserialize(data);
-    this.emitLocal(envelope.event, envelope.payload);
+    this.emitLocal(envelope.event, ...(envelope.payload));
   };
 };
 
