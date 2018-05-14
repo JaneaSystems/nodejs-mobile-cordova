@@ -21,6 +21,8 @@ static CDVNodeJS* activeInstance = nil;
 
 const char* SYSTEM_CHANNEL = "_SYSTEM_";
 
+static BOOL engineAlreadyStarted = NO;
+
 @implementation CDVNodeJS
 
 /**
@@ -267,8 +269,10 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
   }
 #endif
 
-  if ([scriptFileName length] == 0) {
-    errorMsg = @"Arg was null";
+  if (engineAlreadyStarted) {
+    errorMsg = @"Engine already started";
+  } else if ([scriptFileName length] == 0) {
+    errorMsg = @"Invalid filename";
   } else {
     NSString* appPath = [[NSBundle mainBundle] bundlePath];
     scriptPath = [appPath stringByAppendingString:@"/www/nodejs-project/"];
@@ -285,6 +289,7 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
                           scriptPath,
                           nil
                         ];
+    engineAlreadyStarted = YES;
 
     [NodeJSRunner startEngineWithArguments:arguments];
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
@@ -308,7 +313,9 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
   }
 #endif
 
-  if ([scriptBody length] == 0) {
+  if (engineAlreadyStarted) {
+    errorMsg = @"Engine already started";
+  } else if ([scriptBody length] == 0) {
     errorMsg = @"Script is empty";
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMsg];
   } else {
@@ -318,6 +325,7 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
                           scriptBody,
                           nil
                         ];
+    engineAlreadyStarted = YES;
 
     [NodeJSRunner startEngineWithArguments:arguments];
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];

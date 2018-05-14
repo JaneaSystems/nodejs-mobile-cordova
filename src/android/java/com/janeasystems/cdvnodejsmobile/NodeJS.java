@@ -224,7 +224,7 @@ public class NodeJS extends CordovaPlugin {
     }
     NodeJS.engineAlreadyStarted = true;
 
-    if (scriptFileName == null && scriptFileName.isEmpty()) {
+    if (scriptFileName == null || scriptFileName.isEmpty()) {
       sendResult(false, "Invalid filename", callbackContext);
       return;
     }
@@ -271,7 +271,7 @@ public class NodeJS extends CordovaPlugin {
     NodeJS.engineAlreadyStarted = true;
 
     if (scriptBody == null || scriptBody.isEmpty()) {
-      sendResult(false, "Invalid script", callbackContext);
+      sendResult(false, "Script is empty", callbackContext);
       return;
     }
 
