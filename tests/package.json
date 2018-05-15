@@ -1,0 +1,14 @@
+{
+  "name": "nodejs-mobile-cordova-tests",
+  "version": "0.1.5-dev",
+  "description": "Node.js for Mobile Apps Cordova plugin tests",
+  "cordova": {
+    "id": "nodejs-mobile-cordova-tests",
+    "platforms": []
+  },
+  "author": "janeasystems",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^6.0.0"
+  }
+}

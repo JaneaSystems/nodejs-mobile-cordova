@@ -1,0 +1,9 @@
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+  id="nodejs-mobile-cordova-tests"
+  version="0.1.5-dev">
+  <name>Node.js for Mobile Apps Cordova plugin tests</name>
+  <license>MIT</license>
+  <js-module src="tests.js" name="tests">
+  </js-module>
+  <hook type="after_plugin_add" src="hooks/both/install-nodejs-test-project.js"/>
+</plugin>
