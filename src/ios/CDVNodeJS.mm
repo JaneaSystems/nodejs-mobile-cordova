@@ -30,15 +30,18 @@ static BOOL engineAlreadyStarted = NO;
  */
 void sendMessageToApplication(const char* channelName, const char* msg) {
 
-  NSString* channelNameNS = [NSString stringWithUTF8String:channelName];
-  NSString* msgNS = [NSString stringWithUTF8String:msg];
+  @autoreleasepool
+  {
+    NSString* channelNameNS = [NSString stringWithUTF8String:channelName];
+    NSString* msgNS = [NSString stringWithUTF8String:msg];
 
-  if ([channelNameNS isEqualToString:[NSString stringWithUTF8String:SYSTEM_CHANNEL]]) {
-    // If it's a system channel call, handle it in the plugin native side.
-    handleAppChannelMessage(msgNS);
-  } else {
-    // Otherwise, send it to Cordova.
-    sendMessageToCordova(channelNameNS,msgNS);
+    if ([channelNameNS isEqualToString:[NSString stringWithUTF8String:SYSTEM_CHANNEL]]) {
+      // If it's a system channel call, handle it in the plugin native side.
+      handleAppChannelMessage(msgNS);
+    } else {
+      // Otherwise, send it to Cordova.
+      sendMessageToCordova(channelNameNS,msgNS);
+    }
   }
 
 }
