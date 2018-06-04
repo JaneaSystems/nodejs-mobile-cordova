@@ -90,8 +90,11 @@ void rcv_message_from_node(const char* channel_name, const char* msg) {
       jstring java_msg=env->NewStringUTF(msg);
       // Call the method.
       env->CallStaticVoidMethod(cls2, m_sendMessage, java_channel_name, java_msg);
+      env->DeleteLocalRef(java_channel_name);
+      env->DeleteLocalRef(java_msg);
     }
   }
+  env->DeleteLocalRef(cls2);
 }
 
 extern "C" jint JNICALL
