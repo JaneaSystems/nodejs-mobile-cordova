@@ -60,6 +60,8 @@ public class NodeJS extends CordovaPlugin {
 
   private static CallbackContext allChannelListenerContext = null;
 
+  private static final Object onlyOneEngineStartingAtATimeLock = new Object();
+
   // Flag to indicate if node is ready to receive app events.
   private static boolean nodeIsReadyForAppEvents = false;
 
@@ -222,7 +224,6 @@ public class NodeJS extends CordovaPlugin {
       sendResult(false, "Engine already started", callbackContext);
       return;
     }
-    NodeJS.engineAlreadyStarted = true;
 
     if (scriptFileName == null || scriptFileName.isEmpty()) {
       sendResult(false, "Invalid filename", callbackContext);
@@ -244,10 +245,17 @@ public class NodeJS extends CordovaPlugin {
           return;
         }
 
-        File fileObject = new File(scriptFileAbsolutePath);
-        if (!fileObject.exists()) {
-          sendResult(false, "File not found", callbackContext);
-          return;
+        synchronized(onlyOneEngineStartingAtATimeLock) {
+          if (NodeJS.engineAlreadyStarted == true) {
+            sendResult(false, "Engine already started", callbackContext);
+            return;
+          }
+          File fileObject = new File(scriptFileAbsolutePath);
+          if (!fileObject.exists()) {
+            sendResult(false, "File not found", callbackContext);
+            return;
+          }
+          NodeJS.engineAlreadyStarted = true;
         }
 
         sendResult(true, "", callbackContext);
@@ -268,7 +276,6 @@ public class NodeJS extends CordovaPlugin {
       sendResult(false, "Engine already started", callbackContext);
       return;
     }
-    NodeJS.engineAlreadyStarted = true;
 
     if (scriptBody == null || scriptBody.isEmpty()) {
       sendResult(false, "Script is empty", callbackContext);
@@ -286,6 +293,14 @@ public class NodeJS extends CordovaPlugin {
         if (ioe != null) {
           sendResult(false, "Initialization failed: " + ioe.toString(), callbackContext);
           return;
+        }
+
+        synchronized(onlyOneEngineStartingAtATimeLock) {
+          if (NodeJS.engineAlreadyStarted == true) {
+            sendResult(false, "Engine already started", callbackContext);
+            return;
+          }
+          NodeJS.engineAlreadyStarted = true;
         }
 
         sendResult(true, "", callbackContext);
