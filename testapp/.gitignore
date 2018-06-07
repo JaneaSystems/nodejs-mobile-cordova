@@ -1,0 +1,10 @@
+bin/*
+!/plugins
+!/plugins/android.json
+!/plugins/fetch.json
+plugins/*
+platforms/*
+node_modules/*
+www/nodejs-project/*
+temp-module-copy/*
+.DS_Store

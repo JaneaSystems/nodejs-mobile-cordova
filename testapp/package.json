@@ -1,0 +1,29 @@
+{
+  "name": "com.example.cordovatestapp",
+  "displayName": "CordovaTestApp",
+  "version": "1.0.0",
+  "description": "A Cordova application to quickly setup and run the nodejs-mobile tests.",
+  "main": "index.js",
+  "author": "janeasystems",
+  "license": "MIT",
+  "scripts": {
+    "copy-module": "node copy-module-from-parent.js"
+  },
+  "dependencies": {
+    "cordova-android": "^6.3.0",
+    "cordova-ios": "^4.5.4",
+    "cordova-plugin-whitelist": "^1.3.3",
+    "recursive-copy": "^2.0.9"
+  },
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-whitelist": {},
+      "nodejs-mobile-cordova": {},
+      "nodejs-mobile-cordova-tests": {}
+    },
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  }
+}
