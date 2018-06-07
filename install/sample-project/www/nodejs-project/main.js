@@ -35,8 +35,9 @@ cordova.channel.on('myevent', (msg) => {
 // Handle the 'pause' and 'resume' events.
 // These are events raised automatically when the app switched to the
 // background/foreground.
-cordova.app.on('pause', () => {
+cordova.app.on('pause', (pauseLock) => {
   console.log('[node] app paused.');
+  pauseLock.release();
 });
 
 cordova.app.on('resume', () => {
