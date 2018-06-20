@@ -63,6 +63,13 @@ module.exports = function(context) {
     xcodeProject.myRemovePbxScriptBuildPhase(signNativeModulesBuildPhaseName, firstTargetUUID);
   }
 
+    // Removes the build phase to strip the simulator strips.
+    var removeSimulatorArchsBuildPhaseName = 'Remove NodeJS Mobile Framework Simulator Strips';
+    var removeSimulatorArchsBuildPhase = xcodeProject.buildPhaseObject('PBXShellScriptBuildPhase', removeSimulatorArchsBuildPhaseName, firstTargetUUID);
+    if (removeSimulatorArchsBuildPhase) {
+      xcodeProject.myRemovePbxScriptBuildPhase(removeSimulatorArchsBuildPhaseName, firstTargetUUID);
+    }
+
   // Write the changes into the Xcode project.
   fs.writeFileSync(pbxprojPath, xcodeProject.writeSync());
 
