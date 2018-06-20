@@ -74,6 +74,12 @@ void handleAppChannelMessage(NSString* msg) {
 // The callback id of the Cordova channel listener
 NSString* allChannelsListenerCallbackId = nil;
 
+// script name to preload and override dlopen to open native modules from the Framework Path.
+NSString* const NODEJS_DLOPEN_OVERRIDE_FILENAME = @"override-dlopen-paths-preload.js";
+
+// path where the nodejs-project is contained inside the Application package.
+NSString* const NODE_ROOT = @"/www/nodejs-project/";
+
 + (CDVNodeJS*) activeInstance {
   return activeInstance;
 }
@@ -83,7 +89,6 @@ NSString* allChannelsListenerCallbackId = nil;
 
   NSString* const NODE_PATH = @"NODE_PATH";
   NSString* const BUILTIN_MODULES = @"/www/nodejs-mobile-cordova-assets/builtin_modules";
-  NSString* const NODE_ROOT = @"/www/nodejs-project/";
 
   // The 'onAppTerminate', 'onReset' and 'onMemoryWarning' events are already
   // registered in the super class while 'onPause' and 'onResume' are not.
@@ -278,7 +283,7 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
     errorMsg = @"Invalid filename";
   } else {
     NSString* appPath = [[NSBundle mainBundle] bundlePath];
-    scriptPath = [appPath stringByAppendingString:@"/www/nodejs-project/"];
+    scriptPath = [appPath stringByAppendingString:NODE_ROOT];
     scriptPath = [scriptPath stringByAppendingString:scriptFileName];
     if ([[NSFileManager defaultManager] fileExistsAtPath:scriptPath] == FALSE) {
       errorMsg = @"File not found";
@@ -287,11 +292,24 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
   }
 
   if (errorMsg == nil) {
-    NSArray* arguments = [NSArray arrayWithObjects:
-                          @"node",
-                          scriptPath,
-                          nil
-                        ];
+    NSArray* arguments = nil;
+    NSString* dlopenoverridePath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@/%@", NODE_ROOT, NODEJS_DLOPEN_OVERRIDE_FILENAME] ofType:@""];
+    // Check if the file to override dlopen lookup exists, for loading native modules from the Frameworks.
+    if(!dlopenoverridePath) {
+      arguments = [NSArray arrayWithObjects:
+                    @"node",
+                    scriptPath,
+                    nil
+                  ];
+    } else {
+      arguments = [NSArray arrayWithObjects:
+                    @"node",
+                    @"-r",
+                    dlopenoverridePath,
+                    scriptPath,
+                    nil
+                  ];
+    }
     engineAlreadyStarted = YES;
 
     [NodeJSRunner startEngineWithArguments:arguments];
@@ -322,12 +340,26 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
     errorMsg = @"Script is empty";
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:errorMsg];
   } else {
-    NSArray* arguments = [NSArray arrayWithObjects:
-                          @"node",
-                          @"-e",
-                          scriptBody,
-                          nil
-                        ];
+    NSArray* arguments = nil;
+    NSString* dlopenoverridePath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@/%@", NODE_ROOT, NODEJS_DLOPEN_OVERRIDE_FILENAME] ofType:@""];
+    // Check if the file to override dlopen lookup exists, for loading native modules from the Frameworks.
+    if(!dlopenoverridePath) {
+      arguments = [NSArray arrayWithObjects:
+                    @"node",
+                    @"-r",
+                    dlopenoverridePath,
+                    @"-e",
+                    scriptBody,
+                    nil
+                  ];
+    } else {
+      arguments = [NSArray arrayWithObjects:
+                    @"node",
+                    @"-e",
+                    scriptBody,
+                    nil
+                  ];
+    }
     engineAlreadyStarted = YES;
 
     [NodeJSRunner startEngineWithArguments:arguments];
