@@ -20,7 +20,14 @@ module.exports = function(context) {
   var rebuildNativeModulesBuildPhaseScript = `
 set -e
 if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
-  NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
+# If build native modules preference is not set, look for it in the project's
+# www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
+  PREFERENCE_FILE_PATH="$CODESIGNING_FOLDER_PATH/www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt"
+  if [ -f "$PREFERENCE_FILE_PATH" ]; then
+    NODEJS_MOBILE_BUILD_NATIVE_MODULES="$(cat $PREFERENCE_FILE_PATH | xargs)"
+  else
+    NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
+  fi
 fi
 if [ "1" != "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then exit 0; fi
 # Delete object files that may already come from within the npm package.
@@ -66,7 +73,16 @@ popd
   var signNativeModulesBuildPhaseScript = `
 set -e
 if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
-  NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
+# If build native modules preference is not set, look for it in the project's
+# www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
+  PREFERENCE_FILE_PATH="$CODESIGNING_FOLDER_PATH/www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt"
+  if [ -f "$PREFERENCE_FILE_PATH" ]; then
+    NODEJS_MOBILE_BUILD_NATIVE_MODULES="$(cat $PREFERENCE_FILE_PATH | xargs)"
+    # Remove the preference file so it doesn't get in the application package.
+    rm "$PREFERENCE_FILE_PATH"
+  else
+    NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
+  fi
 fi
 if [ "1" != "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then exit 0; fi
 # Delete object files

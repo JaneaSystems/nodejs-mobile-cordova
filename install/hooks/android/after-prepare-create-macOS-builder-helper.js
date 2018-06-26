@@ -24,26 +24,11 @@ function buildMacOSHelperNpmBuildScript(context, platform)
   );
 }
 
-// Adds a file to save the contents of the NODEJS_MOBILE_BUILD_NATIVE_MODULES
-// environment variable if it is set during the prepare step.
-// This workaround is needed for Android Studio on macOS when it is not started
-// from the command line, since environment variables set in the shell won't
-// be available.
-function saveBuildNativeModulesPreference(context, platform)
-{
-  var wwwPath = getPlatformWWWPath(context, platform);
-  var saveBuildNativeModulesPreferencePath = path.join(wwwPath, 'NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt');
-  if (process.env.NODEJS_MOBILE_BUILD_NATIVE_MODULES !== undefined) {
-    fs.writeFileSync(saveBuildNativeModulesPreferencePath, process.env.NODEJS_MOBILE_BUILD_NATIVE_MODULES);
-  }
-}
-
 module.exports = function(context)
 {
   if (context.opts.platforms.indexOf('android') >= 0) {
     if (process.platform === 'darwin') {
       buildMacOSHelperNpmBuildScript(context, 'android');
     }
-    saveBuildNativeModulesPreference(context, 'android');
   }
 }

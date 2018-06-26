@@ -29,6 +29,7 @@
     <hook type="after_plugin_install" src="install/hooks/ios/after-plugin-install.js" />
     <hook type="before_plugin_uninstall" src="install/hooks/ios/before-plugin-uninstall.js" />
     <hook type="after_prepare" src="install/hooks/both/after-prepare-patch-npm-packages.js" />
+    <hook type="after_prepare" src="install/hooks/both/after-prepare-native-modules-preference.js" />
 
     <config-file target="config.xml" parent="/*">
       <feature name="NodeJS">
@@ -59,6 +60,7 @@
     <hook type="after_prepare" src="install/hooks/android/after-prepare-build-node-assets-lists.js" />
     <hook type="after_prepare" src="install/hooks/both/after-prepare-patch-npm-packages.js" />
     <hook type="after_prepare" src="install/hooks/android/after-prepare-create-macOS-builder-helper.js" />
+    <hook type="after_prepare" src="install/hooks/both/after-prepare-native-modules-preference.js" />
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="NodeJS">
