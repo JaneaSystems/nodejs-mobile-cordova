@@ -337,3 +337,29 @@ Rebuild your Cordova project so that the newly added Node modules are added to t
 On Android, the plugin extracts the project files and the Node modules from the APK assets in order to make them available to the Node.js for Mobile Apps engine. They are extracted from the APK and copied to a working folder (`context.getFilesDir().getAbsolutePath() + "/www/nodejs-project/"`) when the application is launched for the first time or a new version of the application has been installed.
 Given the project folder will be overwritten after each application update, it should not be used for persistent data storage.
 To expedite the process of extracting the assets files, instead of parsing the assets hierarchy, a list of files `file.list` and a list of folders `dir.list` are created when the application is compiled and then added to the application assets. On Android 6.x and older versions, this allows to work around a serious perfomance bug in the Android assets manager.
+
+### Native Modules
+
+On Linux and macOS, there is support for building modules that contain native code.
+
+It's recommended to have the build prerequisites mentioned in `nodejs-mobile` for [Android](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-android-library-on-linux-ubuntudebian) and [iOS](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-ios-framework-library-on-macos). For Android it's also recommended that you set the `ANDROID_NDK_HOME` environment variable in your system.
+
+Building native modules for Android can take a long time, since it depends on building a standalone NDK toolchain for each required architecture. The resulting `.node` binaries are then included in the final application in a separate asset path for each architecture and the correct one will be chosen at runtime.
+
+The native modules build support feature is applied if the environment variable `NODEJS_MOBILE_BUILD_NATIVE_MODULES` is `1` while running a command that does the `cordova prepare` step, e.g.: `cordova prepare`, `cordova build`, `cordova run`. This can be used to start the application like this:
+```sh
+NODEJS_MOBILE_BUILD_NATIVE_MODULES=1 cordova run android
+```
+```sh
+NODEJS_MOBILE_BUILD_NATIVE_MODULES=1 cordova run ios
+```
+
+This setting can also be permanently applied to the Cordova project by creating the `www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt` file and setting its contents to `1`. E.g., from the root path of your project:
+```sh
+echo "1" > www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
+cordova run android
+```
+```sh
+echo "1" > www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
+cordova run ios
+```
