@@ -25,6 +25,14 @@ if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
   PREFERENCE_FILE_PATH="$CODESIGNING_FOLDER_PATH/www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt"
   if [ -f "$PREFERENCE_FILE_PATH" ]; then
     NODEJS_MOBILE_BUILD_NATIVE_MODULES="$(cat $PREFERENCE_FILE_PATH | xargs)"
+  fi
+fi
+if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
+# If build native modules preference is not set, try to find .gyp files
+#to turn it on.
+  gypfiles=($(find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -type f -name "*.gyp"))
+  if [ \${#gypfiles[@]} -gt 0 ]; then
+    NODEJS_MOBILE_BUILD_NATIVE_MODULES=1
   else
     NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
   fi
@@ -80,6 +88,14 @@ if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
     NODEJS_MOBILE_BUILD_NATIVE_MODULES="$(cat $PREFERENCE_FILE_PATH | xargs)"
     # Remove the preference file so it doesn't get in the application package.
     rm "$PREFERENCE_FILE_PATH"
+  fi
+fi
+if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
+# If build native modules preference is not set, try to find .gyp files
+#to turn it on.
+  gypfiles=($(find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -type f -name "*.gyp"))
+  if [ \${#gypfiles[@]} -gt 0 ]; then
+    NODEJS_MOBILE_BUILD_NATIVE_MODULES=1
   else
     NODEJS_MOBILE_BUILD_NATIVE_MODULES=0
   fi
