@@ -47,6 +47,10 @@ find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -path "*/*.node/*" -delete
 find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name "*.node" -type d -delete
 find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -path "*/*.framework/*" -delete
 find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name "*.framework" -type d -delete
+# Symlinks to binaries are resolved by cordova prepare during the copy, causing build time errors.
+# The original project's .bin folder will be added to the path before building the native modules.
+find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -path "*/.bin/*" -delete
+find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name ".bin" -type d -delete
 # Get the nodejs-mobile-gyp location
 if [ -d "$PROJECT_DIR/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/" ]; then
 NODEJS_MOBILE_GYP_DIR="$( cd "$PROJECT_DIR" && cd ../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/ && pwd )"
@@ -56,6 +60,12 @@ fi
 NODEJS_MOBILE_GYP_BIN_FILE="$NODEJS_MOBILE_GYP_DIR"/bin/node-gyp.js
 # Rebuild modules with right environment
 NODEJS_HEADERS_DIR="$( cd "$( dirname "$PRODUCT_SETTINGS_PATH" )" && cd Plugins/nodejs-mobile-cordova/ && pwd )"
+# Adds the original project .bin to the path. It's a workaround
+# to correctly build some modules that depend on symlinked modules,
+# like node-pre-gyp.
+if [ -d "$PROJECT_DIR/../../www/nodejs-project/node_modules/.bin/" ]; then
+  PATH="$PROJECT_DIR/../../www/nodejs-project/node_modules/.bin/:$PATH"
+fi
 pushd $CODESIGNING_FOLDER_PATH/www/nodejs-project/
 if [ "$PLATFORM_NAME" == "iphoneos" ]
 then
