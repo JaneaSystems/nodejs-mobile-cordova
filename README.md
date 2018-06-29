@@ -342,19 +342,11 @@ To expedite the process of extracting the assets files, instead of parsing the a
 
 On Linux and macOS, there is support for building modules that contain native code.
 
-It's recommended to have the build prerequisites mentioned in `nodejs-mobile` for [Android](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-android-library-on-linux-ubuntudebian) and [iOS](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-ios-framework-library-on-macos). For Android it's also recommended that you set the `ANDROID_NDK_HOME` environment variable in your system.
+The plugin automatically detects native modules in `./www/nodejs-project/` by searching for `.gyp`files. It's recommended to have the build prerequisites mentioned in `nodejs-mobile` for [Android](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-android-library-on-linux-ubuntudebian) and [iOS](https://github.com/janeasystems/nodejs-mobile#prerequisites-to-build-the-ios-framework-library-on-macos). For Android it's also recommended that you set the `ANDROID_NDK_HOME` environment variable in your system.
 
 Building native modules for Android can take a long time, since it depends on building a standalone NDK toolchain for each required architecture. The resulting `.node` binaries are then included in the final application in a separate asset path for each architecture and the correct one will be chosen at runtime.
 
-The native modules build support feature is applied if the environment variable `NODEJS_MOBILE_BUILD_NATIVE_MODULES` is `1` while running a command that does the `cordova prepare` step, e.g.: `cordova prepare`, `cordova build`, `cordova run`. This can be used to start the application like this:
-```sh
-NODEJS_MOBILE_BUILD_NATIVE_MODULES=1 cordova run android
-```
-```sh
-NODEJS_MOBILE_BUILD_NATIVE_MODULES=1 cordova run ios
-```
-
-This setting can also be permanently applied to the Cordova project by creating the `www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt` file and setting its contents to `1`. E.g., from the root path of your project:
+While the plugin tries to detect automatically the presence of native modules, there's a way to override this detection and turn the native modules build process on or off, by creating the `www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt` file and setting its contents to `1` or `0` respectively.  E.g., from the root path of your project:
 ```sh
 echo "1" > www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
 cordova run android
