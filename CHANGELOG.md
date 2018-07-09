@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.2.0">0.2.0</a><br/>
 <a href="#0.1.5">0.1.5</a><br/>
 <a href="#0.1.4">0.1.4</a><br/>
 <a href="#0.1.3">0.1.3</a><br/>
@@ -14,6 +15,26 @@
 </td>
 </tr>
 </table>
+
+<a id="0.2.0"></a>
+## Version 0.2.0 - Jul 09 2018
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.1.6`, with concurrent GC for iOS.
+ - Improve native modules support.
+ - Automatically detect native modules.
+ - Remove simulator strip when building for iOS devices.
+
+### Commits
+ - [[`a1ab3b8`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/a1ab3b85aeeea49cd08b475f1c692d8d540a8c7e)] - core: update nodejs-mobile v0.1.6 (Jaime Bernardo)
+ - [[`df7df19`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/df7df19b5d5a86b554f4e878f8770d5b41439e17)] - plugin: use original .bin for native modules (Jaime Bernardo)
+ - [[`53a1aeb`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/53a1aebaf9f8e810e348bba31ed6ae96ee5acdd3)] - docs: describe native modules auto detection (Jaime Bernardo)
+ - [[`7dcbe77`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/7dcbe77543fa997b40fda8cac8086c937a6096fb)] - plugin: add automatic native modules detection (Jaime Bernardo)
+ - [[`fea9773`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/fea9773e8e907e9e0ca31b0d88d5a1be4d699ddd)] - docs: add native modules instructions to README (Jaime Bernardo)
+ - [[`29240cd`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/29240cda7913e1e6fa00267b3dd9ab2bae11beb6)] - ios: cache native modules override preference (Jaime Bernardo)
+ - [[`3d430ec`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/3d430eca8162e4f85cbaae446bb9f0a031de25a9)] - ios: building for device removes the x86_64 arch (Jaime Bernardo)
+ - [[`8b7e854`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/8b7e854386e4ce5d6d64fcee27013d7ed7417bcc)] - android: check if native modules assets exist (Jaime Bernardo)
+ - [[`6cd38b0`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/6cd38b0abc86f0acdbc3e899b36937abf906b119)] - ios: build native modules as frameworks (Jaime Bernardo)
 
 <a id="0.1.5"></a>
 ## Version 0.1.5 - Jun 07 2018
