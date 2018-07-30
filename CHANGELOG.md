@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.2.1">0.2.1</a><br/>
 <a href="#0.2.0">0.2.0</a><br/>
 <a href="#0.1.5">0.1.5</a><br/>
 <a href="#0.1.4">0.1.4</a><br/>
@@ -15,6 +16,16 @@
 </td>
 </tr>
 </table>
+
+<a id="0.2.1"></a>
+## Version 0.2.1 - Jul 30 2018
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.1.7`, built with NDK r17b, to solve Android 7 C++ STL runtime issues.
+
+### Commits
+ - [[`86b4f24`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/86b4f245fcda8d6d7e38d1358d224805c010f409)] - core: update nodejs-mobile v0.1.7 (Jaime Bernardo)
+ - [[`2b14218`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/2b14218fbf616249a9d3a9749fa2c2c36a28b7c0)] - ios: create Frameworks path before copying (jonathanz)
 
 <a id="0.2.0"></a>
 ## Version 0.2.0 - Jul 09 2018
