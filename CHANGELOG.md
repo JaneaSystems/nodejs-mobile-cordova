@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.2.2">0.2.2</a><br/>
 <a href="#0.2.1">0.2.1</a><br/>
 <a href="#0.2.0">0.2.0</a><br/>
 <a href="#0.1.5">0.1.5</a><br/>
@@ -16,6 +17,16 @@
 </td>
 </tr>
 </table>
+
+<a id="0.2.2"></a>
+## Version 0.2.2 - Nov 07 2018
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.1.8`, fixing exceptions on Apple A12 CPUs for iOS and being built with NDK r18b for Android.
+
+### Commits
+ - [[`14ee5ea`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/14ee5ea88fc1be10c93e504f1274b2c07d1e77db)] - core: update nodejs-mobile v0.1.8 (Jaime Bernardo)
+ - [[`4c2394a`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/4c2394a1b113cf3364f859488ec5022178c8e6c0)] - docs: document os.tmpdir behavior in node (Jaime Bernardo)
 
 <a id="0.2.1"></a>
 ## Version 0.2.1 - Jul 30 2018
