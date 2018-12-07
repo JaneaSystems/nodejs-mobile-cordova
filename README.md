@@ -1,4 +1,4 @@
-# Node.js for Mobile Apps Cordova plugin
+# Plugin for Nodejs Mobile Apps  forked for  Cordova 8 .
 
 ## Installation
 
