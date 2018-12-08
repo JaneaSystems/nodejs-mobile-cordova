@@ -46,7 +46,7 @@
     <source-file src="src/ios/NodeJSRunner.mm" />
     <header-file src="libs/ios/nodemobile/include" />
 
-    <asset src="install/nodejs-mobile-cordova-assets" target="nodejs-mobile-cordova-assets" />
+    <!--asset src="install/nodejs-mobile-cordova-assets" target="nodejs-mobile-cordova-assets" /-->
     <asset src="install/nodejs-mobile-cordova-assets" target="app/nodejs-mobile-cordova-assets" />
 
     <framework src="libs/ios/nodemobile/NodeMobile.framework" custom="true" embed="true" />
