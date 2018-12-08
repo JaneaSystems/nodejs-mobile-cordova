@@ -3,12 +3,12 @@
 ## Installation
 
 ```bash
-$ cordova plugin add nodejs-mobile-cordova
+$ cordova plugin add https://github.com/tim-coin/nodejs-mobile-cordova8.git
 ```
 
 ## Requirements
 
- - Cordova 7.x (Cordova 8.x is currently not supported)
+ - Cordova 8.x (not supported for Cordova 7.x)
  - iOS 11 or higher
  - Android API 21 or higher
 
