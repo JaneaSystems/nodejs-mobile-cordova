@@ -5,7 +5,7 @@
       version="0.2.2">
 
   <name>Node.js Mobile</name>
-  <description>Node.js for Mobile Apps Cordova Plugin</description>
+  <description>Node.js for Mobile Apps Cordova8 Plugin</description>
   <license>MIT</license>
   <keywords>cordova,mobile,nodejs,node.js</keywords>
 
@@ -47,6 +47,7 @@
     <header-file src="libs/ios/nodemobile/include" />
 
     <asset src="install/nodejs-mobile-cordova-assets" target="nodejs-mobile-cordova-assets" />
+    <asset src="install/nodejs-mobile-cordova-assets" target="app/nodejs-mobile-cordova-assets" />
 
     <framework src="libs/ios/nodemobile/NodeMobile.framework" custom="true" embed="true" />
     <framework src="libs/ios/nodemobile/NodeMobile.framework" />
@@ -79,18 +80,19 @@
       <uses-sdk android:minSdkVersion="21" />
     </edit-config>
 
-    <source-file src="src/android/java/com/janeasystems/cdvnodejsmobile/NodeJS.java" target-dir="src/com/janeasystems/cdvnodejsmobile/" />
+    <source-file src="src/android/java/com/janeasystems/cdvnodejsmobile/NodeJS.java" target-dir="app/src/com/janeasystems/cdvnodejsmobile/" />
 
-    <source-file src="src/common/cordova-bridge/cordova-bridge.h" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
-    <source-file src="src/common/cordova-bridge/cordova-bridge.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
-    <source-file src="src/android/jni/native-lib.cpp" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="src/common/cordova-bridge/cordova-bridge.h" target-dir="app/src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="src/common/cordova-bridge/cordova-bridge.cpp" target-dir="app/src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="src/android/jni/native-lib.cpp" target-dir="app/src/com/janeasystems/cdvnodejsmobile/jni/" />
 
-    <source-file src="libs/android/libnode/" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/" />
+    <source-file src="libs/android/libnode/" target-dir="app/src/com/janeasystems/cdvnodejsmobile/jni/" />
 
     <source-file src="install/nodejs-mobile-cordova-assets/" target-dir="assets/" />
+    <source-file src="install/nodejs-mobile-cordova-assets/" target-dir="app/assets/" />
 
     <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
-    <source-file src="src/android/CMakeLists.txt" target-dir="src/com/janeasystems/cdvnodejsmobile/jni/"/>
+    <source-file src="src/android/CMakeLists.txt" target-dir="app/src/com/janeasystems/cdvnodejsmobile/jni/"/>
 
   </platform>
 
