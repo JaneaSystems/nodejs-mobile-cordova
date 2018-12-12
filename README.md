@@ -1,14 +1,14 @@
-# Plugin for Nodejs Mobile Apps  forked for  Cordova 8 .
+# Node.js for Mobile Apps Cordova plugin
 
 ## Installation
 
 ```bash
-$ cordova plugin add https://github.com/tim-coin/nodejs-mobile-cordova8.git
+$ cordova plugin add nodejs-mobile-cordova
 ```
 
 ## Requirements
 
- - Cordova 8.x (not supported for Cordova 7.x)
+ - Cordova 7.x (Cordova 8.x is currently not supported)
  - iOS 11 or higher
  - Android API 21 or higher
 

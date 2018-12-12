@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:2.2.3'
     }
 }
 
@@ -20,7 +20,7 @@ android {
             }
         }
         ndk {
-            //abiFilters "armeabi-v7a", "x86", "arm64-v8a" ,"x86_64"
+            abiFilters "armeabi-v7a", "x86"
         }
     }
 
@@ -165,9 +165,8 @@ if ("1".equals(shouldRebuildNativeModules)) {
             throw new GradleException("Unsupported opperating system for nodejs-mobile native builds: ${OperatingSystem.current().getName()}")
         }
 
-        task "CopyNodeProjectAssets${abi_name}" (type: Copy){
+        task "CopyNodeProjectAssets${abi_name}" {
             description = "Copying node assets to build native modules for ${abi_name}."
-            /*
             inputs.files fileTree (
                     dir: "${project.projectDir}/assets/www/nodejs-project/"
                 ).exclude({
@@ -178,15 +177,14 @@ if ("1".equals(shouldRebuildNativeModules)) {
                 })
             outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
             doLast {
-              */
                 delete "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
-                //copy {
+                copy {
                     from "${project.projectDir}/assets/www/nodejs-project/"
                     into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
                     // Symlinks to binaries are resolved by cordova prepare and Gradle during the copy, causing build time errors.
                     // The original project's .bin folder will be added to the path while building in the BuildNpmModules tasks.
                     exclude "**/.bin"
-                //}
+                }
                 if (OperatingSystem.current().isMacOsX()) {
                     // Copy the helper script for calling npm when building in Android Studio on macOS.
                     copy {
@@ -194,10 +192,8 @@ if ("1".equals(shouldRebuildNativeModules)) {
                         into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
                     }
                 }
-                outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
-
-                new File("copy.timestamp").text = "${new Date().format('yyyy-MM-dd HH:mm:ss')}"
-            //}
+                new File("${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp").text = "${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+            }
         }
 
         task "MakeToolchain${abi_name}" (type:Exec) {

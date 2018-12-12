@@ -1,9 +1,9 @@
 {
-  "name": "nodejs-mobile-cordova",
-  "version": "0.2.2",
+  "name": "nodejs-mobile-cordova8",
+  "version": "0.0.2",
   "description": "Node.js for Mobile Apps Cordova plugin",
   "cordova": {
-    "id": "nodejs-mobile-cordova",
+    "id": "nodejs-mobile-cordova8",
     "platforms": [
       "ios",
       "android"
@@ -25,13 +25,13 @@
     "nodejs-mobile-gyp": "^0.2.0",
     "tar.gz2": "^1.0.0"
   },
-  "homepage": "https://code.janeasystems.com/nodejs-mobile",
+  "homepage": "https://github.com/tim-coin/nodejs-mobile-cordova8",
   "repository": {
     "type": "git",
-    "url": "https://github.com/janeasystems/nodejs-mobile-cordova"
+    "url": "https://github.com/tim-coin/nodejs-mobile-cordova8"
   },
   "bugs": {
-    "url": "https://github.com/janeasystems/nodejs-mobile/issues"
+    "url": "https://github.com/tim-coin/nodejs-mobile-cordova8/issues"
   },
   "engines": {
     "cordovaDependencies": {
