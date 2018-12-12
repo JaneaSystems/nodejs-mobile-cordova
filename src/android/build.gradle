@@ -5,7 +5,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
     }
 }
 
@@ -51,7 +51,7 @@ String shouldRebuildNativeModules = System.getenv('NODEJS_MOBILE_BUILD_NATIVE_MO
 if (shouldRebuildNativeModules==null) {
 // If the environment variable is not set right now, check if it has been saved to a file during
 // the cordova prepare phase.
-    def nativeModulesPreferenceFile = file("${project.projectDir}/assets/www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt");
+    def nativeModulesPreferenceFile = file("${project.projectDir}/src/main/assets/www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt");
     if (nativeModulesPreferenceFile.exists()) {
         shouldRebuildNativeModules=nativeModulesPreferenceFile.text;
     }
@@ -61,7 +61,7 @@ if (shouldRebuildNativeModules==null) {
 // If build native modules preference is not set, try to find .gyp files to turn it on.
     shouldRebuildNativeModules="0";
     def gyp_files_tree = fileTree(
-        dir: "${project.projectDir}/assets/www/nodejs-project/",
+        dir: "${project.projectDir}/src/main/assets/www/nodejs-project/",
         include: "**/*.gyp"
     );
     gyp_files_tree.visit { gypFile ->
@@ -74,6 +74,7 @@ if (shouldRebuildNativeModules==null) {
 }
 
 if ("1".equals(shouldRebuildNativeModules)) {
+  logger.error("***E1****="+" ${rootProject.buildDir} ")
 
     String npmCommandName = 'npm';
     if (OperatingSystem.current().isMacOsX()) {
@@ -165,8 +166,9 @@ if ("1".equals(shouldRebuildNativeModules)) {
             throw new GradleException("Unsupported opperating system for nodejs-mobile native builds: ${OperatingSystem.current().getName()}")
         }
 
-        task "CopyNodeProjectAssets${abi_name}" {
+        task "CopyNodeProjectAssets${abi_name}" (type: Copy){
             description = "Copying node assets to build native modules for ${abi_name}."
+            /*
             inputs.files fileTree (
                     dir: "${project.projectDir}/assets/www/nodejs-project/"
                 ).exclude({
@@ -177,23 +179,26 @@ if ("1".equals(shouldRebuildNativeModules)) {
                 })
             outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
             doLast {
+              */
                 delete "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
-                copy {
-                    from "${project.projectDir}/assets/www/nodejs-project/"
+                //copy {
+                    from "${project.projectDir}/src/main/assets/www/nodejs-project/"
                     into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
                     // Symlinks to binaries are resolved by cordova prepare and Gradle during the copy, causing build time errors.
                     // The original project's .bin folder will be added to the path while building in the BuildNpmModules tasks.
                     exclude "**/.bin"
-                }
+                //}
                 if (OperatingSystem.current().isMacOsX()) {
                     // Copy the helper script for calling npm when building in Android Studio on macOS.
                     copy {
-                        from "${project.projectDir}/assets/www/build-native-modules-MacOS-helper-script.sh"
+                        from "${project.projectDir}/src/main/assets/www/build-native-modules-MacOS-helper-script.sh"
                         into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
                     }
                 }
-                new File("${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp").text = "${new Date().format('yyyy-MM-dd HH:mm:ss')}"
-            }
+                outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
+
+                new File("copy.timestamp").text = "${new Date().format('yyyy-MM-dd HH:mm:ss')}"
+            //}
         }
 
         task "MakeToolchain${abi_name}" (type:Exec) {
@@ -281,12 +286,12 @@ if ("1".equals(shouldRebuildNativeModules)) {
             }
         }
         cdvPluginPostBuildExtras += { ->
-            tasks.getByPath(":preBuild").dependsOn "GenerateNodeNativeAssetsLists${abi_name}";
+            tasks.getByPath(":app:preBuild").dependsOn "GenerateNodeNativeAssetsLists${abi_name}";
             project.android.sourceSets.main.assets.srcDirs+="${rootProject.buildDir}/nodejs-native-assets/";
         };
     }
 }
 
 cdvPluginPostBuildExtras += { ->
-    android.sourceSets.main.jniLibs.srcDirs += 'src/com/janeasystems/cdvnodejsmobile/jni/libnode/bin/';
+    android.sourceSets.main.jniLibs.srcDirs += "${project.projectDir}/src/com/janeasystems/cdvnodejsmobile/jni/libnode/bin/";
 };

@@ -1,8 +1,8 @@
 var fs = require('fs');
 
 const NODEJS_PROJECT_ROOT = 'www/nodejs-project';
-const FILE_LIST_PATH = 'platforms/android/assets/file.list';
-const DIR_LIST_PATH = 'platforms/android/assets/dir.list';
+const FILE_LIST_PATH = 'platforms/android/app/src/main/assets/file.list';
+const DIR_LIST_PATH = 'platforms/android/app/src/main/assets/dir.list';
 
 var fileList = [];
 var dirList = [];
@@ -30,7 +30,7 @@ function enumFolder(folderPath) {
 function createFileAndFolderLists(callback) {
   enumFolder(NODEJS_PROJECT_ROOT);
   try {
-    fs.writeFileSync(FILE_LIST_PATH, fileList.join('\n')); 
+    fs.writeFileSync(FILE_LIST_PATH, fileList.join('\n'));
     fs.writeFileSync(DIR_LIST_PATH, dirList.join('\n'));
   } catch (err) {
     console.log(err);
