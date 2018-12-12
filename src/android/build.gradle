@@ -1,11 +1,10 @@
-
 buildscript {
     repositories {
         jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
+        classpath 'com.android.tools.build:gradle:2.2.3'
     }
 }
 
@@ -26,7 +25,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path "src/com/janeasystems/cdvnodejsmobile/jni/CMakeLists.txt"
+            path "src/main/java/com/janeasystems/cdvnodejsmobile/jni/CMakeLists.txt"
         }
     }
 
@@ -74,8 +73,7 @@ if (shouldRebuildNativeModules==null) {
 }
 
 if ("1".equals(shouldRebuildNativeModules)) {
-  logger.error("***E1****="+" ${rootProject.buildDir} ")
-
+    logger.error("**** E1 ****");
     String npmCommandName = 'npm';
     if (OperatingSystem.current().isMacOsX()) {
         // On macOS, npm's location may not be in the PATH environment variable if gradle is being run
@@ -148,8 +146,8 @@ if ("1".equals(shouldRebuildNativeModules)) {
         }
 
         String ndk_bundle_path = android.ndkDirectory
-        String standalone_toolchain = "${rootProject.buildDir}/standalone-toolchains/${temp_toolchain_name}"
-        String npm_toolchain_add_to_path = "${rootProject.buildDir}/bin"
+        String standalone_toolchain = "${project.projectDir}/build/standalone-toolchains/${temp_toolchain_name}"
+        String npm_toolchain_add_to_path = "${project.projectDir}/build/bin"
         String npm_toolchain_ar = "${standalone_toolchain}/bin/${temp_suffix}-ar"
         String npm_toolchain_cc = "${standalone_toolchain}/bin/${temp_suffix}-clang"
         String npm_toolchain_cxx = "${standalone_toolchain}/bin/${temp_suffix}-clang++"
@@ -168,22 +166,11 @@ if ("1".equals(shouldRebuildNativeModules)) {
 
         task "CopyNodeProjectAssets${abi_name}" (type: Copy){
             description = "Copying node assets to build native modules for ${abi_name}."
-            /*
-            inputs.files fileTree (
-                    dir: "${project.projectDir}/assets/www/nodejs-project/"
-                ).exclude({
-                    details -> // We shouldn't need to rebuild native code if there are only changes in the Node.js project javascript files.
-                        !details.isDirectory() &&
-                        details.getPath().endsWith('.js') &&
-                        !details.getPath().startsWith('node_modules/')
-                })
-            outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
-            doLast {
-              */
-                delete "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
+
+                delete "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
                 //copy {
                     from "${project.projectDir}/src/main/assets/www/nodejs-project/"
-                    into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
+                    into "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
                     // Symlinks to binaries are resolved by cordova prepare and Gradle during the copy, causing build time errors.
                     // The original project's .bin folder will be added to the path while building in the BuildNpmModules tasks.
                     exclude "**/.bin"
@@ -192,10 +179,10 @@ if ("1".equals(shouldRebuildNativeModules)) {
                     // Copy the helper script for calling npm when building in Android Studio on macOS.
                     copy {
                         from "${project.projectDir}/src/main/assets/www/build-native-modules-MacOS-helper-script.sh"
-                        into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
+                        into "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
                     }
                 }
-                outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
+                outputs.file "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
 
                 new File("copy.timestamp").text = "${new Date().format('yyyy-MM-dd HH:mm:ss')}"
             //}
@@ -211,14 +198,14 @@ if ("1".equals(shouldRebuildNativeModules)) {
         task "BuildNpmModules${abi_name}" (type:Exec) {
             dependsOn "MakeToolchain${abi_name}"
             dependsOn "CopyNodeProjectAssets${abi_name}"
-            inputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
-            outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
+            inputs.file "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
+            outputs.file "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
             description = "Building native modules for ${abi_name}."
-            workingDir "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
+            workingDir "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
             commandLine npmCommandName, '--verbose', 'rebuild', '--build-from-source'
             //environment ('PATH', "${npm_toolchain_add_to_path}" + System.getProperty("path.separator") + "${System.env.PATH}")
             environment ('npm_config_node_engine', 'v8' )
-            environment ('npm_config_nodedir', "${project.projectDir}/src/com/janeasystems/cdvnodejsmobile/jni/libnode/" )
+            environment ('npm_config_nodedir', "${project.projectDir}/src/main/src/com/janeasystems/cdvnodejsmobile/jni/libnode/" )
             String npm_gyp_path_to_use;
             if( file("${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
                 npm_gyp_path_to_use = "${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
@@ -249,8 +236,8 @@ if ("1".equals(shouldRebuildNativeModules)) {
         task "CopyBuiltNpmAssets${abi_name}" (type:Sync) {
             dependsOn "BuildNpmModules${abi_name}"
             description = "Copying node assets with build native modules for ${abi_name}."
-            from "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
-            into "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/"
+            from "${project.projectDir}/build/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
+            into "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/"
             includeEmptyDirs = false
             include '**/*.node'
         }
@@ -258,20 +245,20 @@ if ("1".equals(shouldRebuildNativeModules)) {
         task "GenerateNodeNativeAssetsLists${abi_name}" {
             dependsOn "CopyBuiltNpmAssets${abi_name}"
             description "Generates a list for runtime copying"
-            inputs.file "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/"
-            outputs.file "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list"
-            outputs.file "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list"
+            inputs.file "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/"
+            outputs.file "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list"
+            outputs.file "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list"
             doLast{
-                if(!(new File("${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/")).exists()) {
+                if(!(new File("${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/")).exists()) {
                     // If the native assets folder doesn't exist from the copy task, skip the creation of the file.list
                     return;
                 }
-                delete "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list"
-                delete "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list"
+                delete "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list"
+                delete "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list"
                 String file_list = "";
                 String dir_list = "";
 
-                def assets_tree = fileTree(dir: "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/" )
+                def assets_tree = fileTree(dir: "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/" )
                 assets_tree.visit { assetFile ->
                     if (assetFile.isDirectory()) {
                     dir_list+="${assetFile.relativePath}\n"
@@ -279,19 +266,19 @@ if ("1".equals(shouldRebuildNativeModules)) {
                     file_list+="${assetFile.relativePath}\n"
                     }
                 }
-                def file_list_path = new File( "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list")
+                def file_list_path = new File( "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list")
                 file_list_path.write file_list
-                def dir_list_path = new File( "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list")
+                def dir_list_path = new File( "${project.projectDir}/build/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list")
                 dir_list_path.write dir_list
             }
         }
         cdvPluginPostBuildExtras += { ->
             tasks.getByPath(":app:preBuild").dependsOn "GenerateNodeNativeAssetsLists${abi_name}";
-            project.android.sourceSets.main.assets.srcDirs+="${rootProject.buildDir}/nodejs-native-assets/";
+            project.android.sourceSets.main.assets.srcDirs+="${project.projectDir}/build/nodejs-native-assets/";
         };
     }
 }
 
 cdvPluginPostBuildExtras += { ->
-    android.sourceSets.main.jniLibs.srcDirs += "${project.projectDir}/src/com/janeasystems/cdvnodejsmobile/jni/libnode/bin/";
+    android.sourceSets.main.jniLibs.srcDirs += '/src/main/src/com/janeasystems/cdvnodejsmobile/jni/libnode/bin/';
 };

@@ -66,9 +66,25 @@ public class NodeJS extends CordovaPlugin {
   private static boolean nodeIsReadyForAppEvents = false;
 
   static {
-    System.loadLibrary("nodejs-mobile-cordova-native-lib");
+    System.out.println("NODEJS L:69");
+    String libPath = System.getProperty("java.library.path");
+    System.out.println("java.library.path=" + libPath);
+    try {
+      System.loadLibrary("nodejs-mobile-cordova-native-lib");
+    }catch (RuntimeException e) {
+        System.out.print("RuntimeException: ");
+        System.out.println(e.getMessage());
+    } catch (Exception e) {
+        System.out.print("Exception: ");
+        System.out.println(e.getMessage());
+    }
+    finally {
+        System.out.println("try-block entered.");
+    }
     System.loadLibrary("node");
+    System.out.println("NODEJS L72");
   }
+
 
   public native Integer startNodeWithArguments(String[] arguments, String nodePath, boolean redirectOutputToLogcat);
   public native void sendMessageToNodeChannel(String channelName, String msg);
