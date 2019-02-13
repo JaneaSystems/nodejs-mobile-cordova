@@ -361,3 +361,27 @@ cordova run android
 echo "1" > www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
 cordova run ios
 ```
+
+## Troubleshooting
+
+### Android
+
+If the installed Android NDK version is `>= r18`, the following error can occur while building for Android:
+```
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring root project 'android'.
+> No toolchains found in the NDK toolchains folder for ABI with prefix: mips64el-linux-android
+```
+
+This is caused by the Gradle version used by `cordova-android` version `6.x` not supporting the NDK toolchain versions greater than `r18`, as documented in this [cordova-android issue](https://github.com/apache/cordova-android/issues/504) and the [Android NDK r18 Changelog's known issues](https://github.com/android-ndk/ndk/wiki/Changelog-r18#known-issues).
+
+The [cordova-android issue](https://github.com/apache/cordova-android/issues/504) mentions possible workarounds the user may take to get around this issue, including updating the gradle plugin used by your Android Project / using an older NDK.
+
+To solve this issue while using Android NDK versions `>= r18` with cordova-android 6.x without having to update the project created by cordova, the recommended workaround would be to copy the `mips64el-linux-android-4.9` and `mipsel-linux-android-4.9` toolchains from an older release into your local NDK install or create a local link to other toolchains so that the Gradle internal checks pass, since these toolchains won't be used by Cordova. Here's one way to do this, assuming the `ANDROID_NDK_HOME` environment variable is set in your system:
+```
+cd $ANDROID_NDK_HOME/toolchains
+ln -s aarch64-linux-android-4.9 mips64el-linux-android
+ln -s arm-linux-androideabi-4.9 mipsel-linux-android
+```
