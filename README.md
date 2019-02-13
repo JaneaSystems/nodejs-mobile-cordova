@@ -385,3 +385,29 @@ cd $ANDROID_NDK_HOME/toolchains
 ln -s aarch64-linux-android-4.9 mips64el-linux-android
 ln -s arm-linux-androideabi-4.9 mipsel-linux-android
 ```
+
+### iOS
+
+When using `Xcode 10` with `cordova-ios` version `4.x`, the following error might occur when trying to build or run the application:
+```
+The executable was signed with invalid entitlements.
+
+The entitlements specified in you Application's Code Signing Entitlements file are invalid, not permitted, or do not match those specified in you provisioning profile.
+```
+
+This is caused by the new `Xcode 10` build system, as documented in this [cordova-ios issue](https://github.com/apache/cordova-ios/issues/407), including these recommended workarounds:
+
+* Including the `--buildFlag="-UseModernBuildSystem=0"` flag in the `build` and `run` commands:
+```
+cordova run ios --buildFlag='-UseModernBuildSystem=0'
+cordova build ios --buildFlag='-UseModernBuildSystem=0'
+```
+* Adding the flag under the iOS release or debug config when using a `build.json` config file:
+```
+"buildFlag": [
+  "-UseModernBuildSystem=0"
+]
+```
+* Changing the build system to the "Legacy Build System" when building from the Xcode IDE:
+  1. In the Xcode "File Menu", select "Project Settings...";
+  1. In the "Project Settings..." window, inside the "Per-User Project Settings:" area, change the "Build System:" setting to "Legacy Build System".
