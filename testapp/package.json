@@ -10,7 +10,7 @@
     "copy-module": "node copy-module-from-parent.js"
   },
   "dependencies": {
-    "cordova-android": "^6.3.0",
+    "cordova-android": "^6.4.0",
     "cordova-ios": "^4.5.4",
     "cordova-plugin-whitelist": "^1.3.3",
     "recursive-copy": "^2.0.9"
