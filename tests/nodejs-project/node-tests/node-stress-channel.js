@@ -14,8 +14,6 @@ class TestNodeStressChannel extends TestBase {
         cordova.channel.post('node-stress-channel', num_msgs_sent);
         num_msgs_sent++;
       }
-      let logMsg = 'Node sent ' + num_msgs_sent + ' messages. ';
-      console.log(logMsg);
     });
   }
   static cleanUp() {

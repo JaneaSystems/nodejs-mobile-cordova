@@ -1445,19 +1445,17 @@ exports.defineManualTests = function(contentEl, createActionButton) {
   });
   createActionButton('Stress cordova-node channel', function() {
     nodejs.channel.removeAllListeners();
-    contentEl.innerHTML = 'This test will send messages to node, 1000 at a time. You have to press the Stop current tests button to stop it.<br/>';
+    let test_header = 'This test will send messages to node, 1000 at a time. You have to press the Stop current tests button to stop it.<br/>';
+    contentEl.innerHTML = test_header;
     let num_msgs_sent = 0;
     function send_1000_msgs() {
       for(let i=0;i<1000;i++) {
         nodejs.channel.post('test-stress-channel', num_msgs_sent);
         num_msgs_sent++;
       }
-      let logMsg = 'Sent ' + num_msgs_sent + ' messages. ';
-      contentEl.innerHTML += logMsg;
     }
     nodejs.channel.on('stress-channel-report', (num_rcvd) => {
-      let logMsg = 'Node received ' + num_rcvd + ' messages.'
-      contentEl.innerHTML += logMsg + '<br/>';
+      contentEl.innerHTML = test_header + 'Node received ' + num_rcvd + ' messages.<br/>';
       send_1000_msgs();
     });
     function completeTest() {
@@ -1472,23 +1470,23 @@ exports.defineManualTests = function(contentEl, createActionButton) {
   })
   createActionButton('Stress node-cordova channel', function() {
     nodejs.channel.removeAllListeners();
-    contentEl.innerHTML = 'This test will ask for node to send messages, 1000 at a time. You have to press the Stop current tests button to stop it.<br/>';
+    let test_header = 'This test will ask for node to send messages, 1000 at a time. You have to press the Stop current tests button to stop it.<br/>';
+    contentEl.innerHTML = test_header;
     let num_msgs_received = 0;
     let last_msg_received = 0;
+    let out_of_order_warning_given = false;
     function ask_for_1000_msgs() {
       nodejs.channel.post('test-node-stress-channel', 1000);
-      let logMsg = 'Asked for 1000 more messages. ';
-      contentEl.innerHTML += logMsg;
     }
     nodejs.channel.on('node-stress-channel', (msg) => {
       num_msgs_received++;
-      if (msg<last_msg_received) {
+      if (!out_of_order_warning_given && msg<last_msg_received) {
         console.log('Out of order message on Cordova. ' + msg + ' arrived after ' + last_msg_received);
+        out_of_order_warning_given = true;
       }
       last_msg_received=msg;
       if(num_msgs_received%1000==0) {
-        let logMsg = 'Cordova received ' + num_msgs_received + ' messages.'
-        contentEl.innerHTML += logMsg + '<br/>';
+        contentEl.innerHTML = test_header + 'Cordova received ' + num_msgs_received + ' messages.<br/>';
         ask_for_1000_msgs();
       }
     });
