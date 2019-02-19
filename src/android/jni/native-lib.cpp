@@ -93,8 +93,8 @@ void rcv_message_from_node(const char* channel_name, const char* msg) {
       env->DeleteLocalRef(java_channel_name);
       env->DeleteLocalRef(java_msg);
     }
+    env->DeleteLocalRef(cls2);
   }
-  env->DeleteLocalRef(cls2);
 }
 
 extern "C" jint JNICALL
@@ -116,8 +116,12 @@ Java_com_janeasystems_cdvnodejsmobile_NodeJS_startNodeWithArguments(
   // Compute byte size need for all arguments in contiguous memory.
   int c_arguments_size = 0;
   for (int i = 0; i < argument_count ; i++) {
-    c_arguments_size += strlen(env->GetStringUTFChars((jstring)env->GetObjectArrayElement(arguments, i), 0));
+    jstring n_arg = (jstring)env->GetObjectArrayElement(arguments, i);
+    const char* n_arg_contents = env->GetStringUTFChars(n_arg, 0);
+    c_arguments_size += strlen(n_arg_contents);
     c_arguments_size++; // for '\0'
+    env->ReleaseStringUTFChars(n_arg, n_arg_contents);
+    env->DeleteLocalRef(n_arg);
   }
 
   // Stores arguments in contiguous memory.
@@ -131,10 +135,15 @@ Java_com_janeasystems_cdvnodejsmobile_NodeJS_startNodeWithArguments(
 
   // Populate the args_buffer and argv.
   for (int i = 0; i < argument_count ; i++) {
-    const char* current_argument = env->GetStringUTFChars((jstring)env->GetObjectArrayElement(arguments, i), 0);
+    jstring n_arg = (jstring)env->GetObjectArrayElement(arguments, i);
+    const char* current_argument = env->GetStringUTFChars(n_arg, 0);
 
     // Copy current argument to its expected position in args_buffer.
     strncpy(current_args_position, current_argument, strlen(current_argument));
+
+    //Release the JNI references.
+    env->ReleaseStringUTFChars(n_arg, current_argument);
+    env->DeleteLocalRef(n_arg);
 
     // Save current argument start position in argv.
     argv[i] = current_args_position;
