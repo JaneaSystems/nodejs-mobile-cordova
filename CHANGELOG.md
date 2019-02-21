@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.2.3">0.2.3</a><br/>
 <a href="#0.2.2">0.2.2</a><br/>
 <a href="#0.2.1">0.2.1</a><br/>
 <a href="#0.2.0">0.2.0</a><br/>
@@ -17,6 +18,23 @@
 </td>
 </tr>
 </table>
+
+<a id="0.2.3"></a>
+## Version 0.2.3 - Feb 21 2018
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.1.9`.
+ - Adopt target defined by the Cordova app in Android.
+ - Improve JNI reference cleaning.
+
+### Commits
+  - [[`0c79eff`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/0c79eff29381353c07b7cc30d2b1b1dd48974a9c)] - android: release JNI references from initializing (Jaime Bernardo)
+ - [[`4a79e96`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/4a79e96b8f313296fb050ecc413f053d1ac7f5c8)] - test: optimize stress test memory output (Jaime Bernardo)
+ - [[`eed7662`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/eed766298cf481587ff5bce9bf359e018a099464)] - doc: add Xcode 10 Legacy Build System workaround (Jaime Bernardo)
+ - [[`baeece3`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/baeece3e93cb89fc97c4ca501f354ef6e84b62c0)] - doc: workaround for missing NDK mips64el toolchain (Jaime Bernardo)
+ - [[`9850627`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/98506271475ed488db6e267d76ed563857b5d1f7)] - test: update testapp cordova-android to 6.4.0 (Jaime Bernardo)
+ - [[`a91ff10`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/a91ff10e42b1060a142079a4e9e7b17d44dfd7dc)] - android: adopt app project defined targets (Jaime Bernardo)
+ - [[`5ab4e77`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/5ab4e770fcc9b7004f308d91588443ee2068ce96)] - core: update nodejs-mobile v0.1.9 (Jaime Bernardo)
 
 <a id="0.2.2"></a>
 ## Version 0.2.2 - Nov 07 2018
