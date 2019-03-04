@@ -24,7 +24,7 @@ android {
 
     externalNativeBuild {
         cmake {
-            path "src/com/janeasystems/cdvnodejsmobile/jni/CMakeLists.txt"
+            path "libs/cdvnodejsmobile/CMakeLists.txt"
         }
     }
 
@@ -43,13 +43,23 @@ cdvPluginPostBuildExtras += { ->
 };
 
 import org.gradle.internal.os.OperatingSystem;
+String projectWWW; // www assets folder from the Application project.
+if ( file("${project.projectDir}/src/main/assets/www/").exists() ) {
+    // www folder for cordova-android >= 7
+    projectWWW = "${project.projectDir}/src/main/assets/www";
+} else if (file("${project.projectDir}/assets/www/").exists()) {
+    // www folder for cordova-android < 7
+    projectWWW = "${project.projectDir}/assets/www";
+} else {
+    throw new GradleException('nodejs-mobile-cordova couldn\'t find the www folder in the Android project.');
+}
 
 String shouldRebuildNativeModules = System.getenv('NODEJS_MOBILE_BUILD_NATIVE_MODULES');
 
 if (shouldRebuildNativeModules==null) {
 // If the environment variable is not set right now, check if it has been saved to a file during
 // the cordova prepare phase.
-    def nativeModulesPreferenceFile = file("${project.projectDir}/assets/www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt");
+    def nativeModulesPreferenceFile = file("${projectWWW}/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt");
     if (nativeModulesPreferenceFile.exists()) {
         shouldRebuildNativeModules=nativeModulesPreferenceFile.text;
     }
@@ -59,7 +69,7 @@ if (shouldRebuildNativeModules==null) {
 // If build native modules preference is not set, try to find .gyp files to turn it on.
     shouldRebuildNativeModules="0";
     def gyp_files_tree = fileTree(
-        dir: "${project.projectDir}/assets/www/nodejs-project/",
+        dir: "${projectWWW}/nodejs-project/",
         include: "**/*.gyp"
     );
     gyp_files_tree.visit { gypFile ->
@@ -166,7 +176,7 @@ if ("1".equals(shouldRebuildNativeModules)) {
         task "CopyNodeProjectAssets${abi_name}" {
             description = "Copying node assets to build native modules for ${abi_name}."
             inputs.files fileTree (
-                    dir: "${project.projectDir}/assets/www/nodejs-project/"
+                    dir: "${projectWWW}/nodejs-project/"
                 ).exclude({
                     details -> // We shouldn't need to rebuild native code if there are only changes in the Node.js project javascript files.
                         !details.isDirectory() &&
@@ -177,7 +187,7 @@ if ("1".equals(shouldRebuildNativeModules)) {
             doLast {
                 delete "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
                 copy {
-                    from "${project.projectDir}/assets/www/nodejs-project/"
+                    from "${projectWWW}/nodejs-project/"
                     into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
                     // Symlinks to binaries are resolved by cordova prepare and Gradle during the copy, causing build time errors.
                     // The original project's .bin folder will be added to the path while building in the BuildNpmModules tasks.
@@ -186,7 +196,7 @@ if ("1".equals(shouldRebuildNativeModules)) {
                 if (OperatingSystem.current().isMacOsX()) {
                     // Copy the helper script for calling npm when building in Android Studio on macOS.
                     copy {
-                        from "${project.projectDir}/assets/www/build-native-modules-MacOS-helper-script.sh"
+                        from "${projectWWW}/build-native-modules-MacOS-helper-script.sh"
                         into "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/"
                     }
                 }
@@ -211,7 +221,7 @@ if ("1".equals(shouldRebuildNativeModules)) {
             commandLine npmCommandName, '--verbose', 'rebuild', '--build-from-source'
             //environment ('PATH', "${npm_toolchain_add_to_path}" + System.getProperty("path.separator") + "${System.env.PATH}")
             environment ('npm_config_node_engine', 'v8' )
-            environment ('npm_config_nodedir', "${project.projectDir}/src/com/janeasystems/cdvnodejsmobile/jni/libnode/" )
+            environment ('npm_config_nodedir', "${project.projectDir}/libs/cdvnodejsmobile/libnode/" )
             String npm_gyp_path_to_use;
             if( file("${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
                 npm_gyp_path_to_use = "${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
@@ -279,12 +289,12 @@ if ("1".equals(shouldRebuildNativeModules)) {
             }
         }
         cdvPluginPostBuildExtras += { ->
-            tasks.getByPath(":preBuild").dependsOn "GenerateNodeNativeAssetsLists${abi_name}";
+            tasks.getByPath(":${(project.getParent()==null)?"":(project.name+":")}preBuild").dependsOn "GenerateNodeNativeAssetsLists${abi_name}";
             project.android.sourceSets.main.assets.srcDirs+="${rootProject.buildDir}/nodejs-native-assets/";
         };
     }
 }
 
 cdvPluginPostBuildExtras += { ->
-    android.sourceSets.main.jniLibs.srcDirs += 'src/com/janeasystems/cdvnodejsmobile/jni/libnode/bin/';
+    android.sourceSets.main.jniLibs.srcDirs += 'libs/cdvnodejsmobile/libnode/bin/';
 };

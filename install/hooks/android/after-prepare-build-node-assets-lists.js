@@ -1,8 +1,5 @@
 var fs = require('fs');
-
-const NODEJS_PROJECT_ROOT = 'www/nodejs-project';
-const FILE_LIST_PATH = 'platforms/android/assets/file.list';
-const DIR_LIST_PATH = 'platforms/android/assets/dir.list';
+var path = require('path');
 
 var fileList = [];
 var dirList = [];
@@ -27,11 +24,19 @@ function enumFolder(folderPath) {
   }
 }
 
-function createFileAndFolderLists(callback) {
-  enumFolder(NODEJS_PROJECT_ROOT);
+function createFileAndFolderLists(context, callback) {
   try {
-    fs.writeFileSync(FILE_LIST_PATH, fileList.join('\n')); 
-    fs.writeFileSync(DIR_LIST_PATH, dirList.join('\n'));
+    var cordovaLib = context.requireCordovaModule('cordova-lib');
+    var platformAPI = cordovaLib.cordova_platforms.getPlatformApi('android');
+    var nodeJsProjectRoot = path.join('www', 'nodejs-project');
+    // The Android application's assets path will be the parent of the application's www folder.
+    var androidAssetsPath = path.join(platformAPI.locations.www,'..');
+    var fileListPath = path.join(androidAssetsPath,'file.list');
+    var dirListPath = path.join(androidAssetsPath,'dir.list');
+
+    enumFolder(nodeJsProjectRoot);
+    fs.writeFileSync(fileListPath, fileList.join('\n'));
+    fs.writeFileSync(dirListPath, dirList.join('\n'));
   } catch (err) {
     console.log(err);
     callback(err);
@@ -41,10 +46,14 @@ function createFileAndFolderLists(callback) {
 }
 
 module.exports = function(context) {
+  if (context.opts.platforms.indexOf('android') < 0) {
+    return;
+  }
+
   var Q = context.requireCordovaModule('q');
   var deferral = new Q.defer();
 
-  createFileAndFolderLists(function(err) {
+  createFileAndFolderLists(context, function(err) {
     if (err) {
       deferral.reject(err);
     } else {
