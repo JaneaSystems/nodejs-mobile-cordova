@@ -17,9 +17,6 @@ android {
                 arguments "-DANDROID_STL=c++_shared"
             }
         }
-        ndk {
-            abiFilters "armeabi-v7a", "x86"
-        }
     }
 
     externalNativeBuild {
@@ -104,7 +101,13 @@ if ("1".equals(shouldRebuildNativeModules)) {
         }
     }
 
-    android.defaultConfig.ndk.abiFilters.each { abi_name ->
+    def nativeModulesABIs = android.defaultConfig.ndk.abiFilters;
+    if (nativeModulesABIs == null) {
+        // No abiFilter is defined for the build. Build native modules for every architecture.
+        nativeModulesABIs = ["armeabi-v7a", "x86", "arm64-v8a", "x86_64"] as Set<String>;
+    }
+
+    nativeModulesABIs.each { abi_name ->
         String temp_arch = {
             switch (abi_name) {
                 case 'armeabi-v7a':

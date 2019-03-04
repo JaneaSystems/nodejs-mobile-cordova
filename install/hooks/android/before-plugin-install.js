@@ -5,6 +5,8 @@ const nodeProjectFolder = 'www/nodejs-project';
 const libFolderPath = 'plugins/nodejs-mobile-cordova/libs/android/libnode/bin/';
 const path_armv7 = libFolderPath + 'armeabi-v7a/';
 const path_x86 = libFolderPath + 'x86/'
+const path_arm64 = libFolderPath + 'arm64-v8a/';
+const path_x64 = libFolderPath + 'x86_64/'
 const lib_name = 'libnode.so';
 const lib_name_gz = lib_name + '.gz';
 
@@ -26,7 +28,11 @@ function unzip(libFolderPath, callback) {
 function unzipAll(callback) {
   unzip(path_armv7, function() {
     unzip(path_x86, function() {
-      callback(null);
+      unzip(path_arm64, function() {
+        unzip(path_x64, function() {
+          callback(null);
+        });
+      });
     });
   });
 }
