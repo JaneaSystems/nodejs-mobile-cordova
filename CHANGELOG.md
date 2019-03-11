@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.2.4">0.2.4</a><br/>
 <a href="#0.2.3">0.2.3</a><br/>
 <a href="#0.2.2">0.2.2</a><br/>
 <a href="#0.2.1">0.2.1</a><br/>
@@ -19,8 +20,21 @@
 </tr>
 </table>
 
+<a id="0.2.4"></a>
+## Version 0.2.4 - Mar 11 2019
+
+### Notable Changes
+ - Support Cordova 8.
+ - Add 64 bit binaries for Android.
+
+### Commits
+ - [[`bdfdee5`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/bdfdee5621114fe427fe9ba8a79e27df4dbdeaf0)] - doc: remove Cordova 8 not being supported (Jaime Bernardo)
+ - [[`e38c2d4`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/e38c2d4fc55ac3d283984c4d1e8eec11f9998716)] - test: update testapp versions to Cordova 8 (Jaime Bernardo)
+ - [[`b5e0e24`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/b5e0e245bb1d6a240a0cd4919893bae602959d15)] - android: add 64-bit binaries support (Jaime Bernardo)
+ - [[`ce81228`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/ce81228ed8829e51cbc08970923f5a2ed594cf8d)] - android: support new platform project structure (Jaime Bernardo)
+
 <a id="0.2.3"></a>
-## Version 0.2.3 - Feb 21 2018
+## Version 0.2.3 - Feb 21 2019
 
 ### Notable Changes
  - Update `nodejs-mobile` binaries to `v0.1.9`.
