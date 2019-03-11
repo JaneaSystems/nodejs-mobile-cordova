@@ -8,7 +8,7 @@ $ cordova plugin add nodejs-mobile-cordova
 
 ## Requirements
 
- - Cordova 7.x (Cordova 8.x is currently not supported)
+ - Cordova 7.x or higher
  - iOS 11 or higher
  - Android API 21 or higher
 
