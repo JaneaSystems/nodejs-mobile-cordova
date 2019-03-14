@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.2.5">0.2.5</a><br/>
 <a href="#0.2.4">0.2.4</a><br/>
 <a href="#0.2.3">0.2.3</a><br/>
 <a href="#0.2.2">0.2.2</a><br/>
@@ -19,6 +20,15 @@
 </td>
 </tr>
 </table>
+
+<a id="0.2.5"></a>
+## Version 0.2.5 - Mar 14 2019
+
+### Notable Changes
+ - Hotfix release: previous release didn't build for `cordova-android <= 6.3.0`.
+
+### Commits
+ - [[`bc3c596`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/bc3c596a88ddae729b60e3c3ac3b4def42952111)] - android: always specify abiFilter if not set (Jaime Bernardo)
 
 <a id="0.2.4"></a>
 ## Version 0.2.4 - Mar 11 2019
