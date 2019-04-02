@@ -22,7 +22,7 @@
   "author": "janeasystems",
   "license": "MIT",
   "dependencies": {
-    "nodejs-mobile-gyp": "^0.2.0",
+    "nodejs-mobile-gyp": "^0.3.0",
     "tar.gz2": "^1.0.0"
   },
   "homepage": "https://code.janeasystems.com/nodejs-mobile",

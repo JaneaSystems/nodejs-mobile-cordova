@@ -21,7 +21,7 @@ add_library( # Sets the name of the library.
              cordova-bridge.cpp
            )
 
-include_directories(libnode/)
+include_directories(libnode/include/node/)
 
 add_library( libnode
              SHARED

@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <android/log.h>
 
-#include "include/node/node.h"
+#include "node.h"
 #include "cordova-bridge.h"
 
 const char *ADBTAG = "NODEJS-MOBILE";
