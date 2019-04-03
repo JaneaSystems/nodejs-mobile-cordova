@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.3.0">0.3.0</a><br/>
 <a href="#0.2.5">0.2.5</a><br/>
 <a href="#0.2.4">0.2.4</a><br/>
 <a href="#0.2.3">0.2.3</a><br/>
@@ -20,6 +21,15 @@
 </td>
 </tr>
 </table>
+
+<a id="0.3.0"></a>
+## Version 0.3.0 - Apr 3 2019
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.2.0`, which updates the engine to `v10.13.0` LTS.
+
+### Commits
+ - [[`2e0ee4d`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/2e0ee4d3f9c72e2b2791d2125e4f9aa222eed378)] - core: update nodejs-mobile v0.2.0 (Jaime Bernardo)
 
 <a id="0.2.5"></a>
 ## Version 0.2.5 - Mar 14 2019
