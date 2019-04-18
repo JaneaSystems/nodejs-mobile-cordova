@@ -505,6 +505,21 @@ exports.defineAutoTests = function () {
       nodejs.channel.post('test-echo', 'bar');
     });
 
+    it( 'should not throw error when going over MaxListeners' , function(done) {
+      let listenerNumberToTest = nodejs.channel.getMaxListeners()+1;
+      let numberCalled = 0;
+      for(let i=0;i<listenerNumberToTest;i++) {
+        nodejs.channel.addListener('echo', function(replyObj) {
+          numberCalled++;
+          if(numberCalled>=listenerNumberToTest) {
+            done();
+          }
+        });
+      }
+      expect(nodejs.channel.listenerCount('echo')).toBe(listenerNumberToTest);
+      nodejs.channel.post('test-echo', 'foo');
+    });
+
     afterEach( function(done) {
       nodejs.channel.removeAllListeners('echo');
       generalCleanUp('echo', done);
