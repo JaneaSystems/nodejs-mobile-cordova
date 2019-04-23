@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.3.1">0.3.1</a><br/>
 <a href="#0.3.0">0.3.0</a><br/>
 <a href="#0.2.5">0.2.5</a><br/>
 <a href="#0.2.4">0.2.4</a><br/>
@@ -21,6 +22,20 @@
 </td>
 </tr>
 </table>
+
+<a id="0.3.1"></a>
+## Version 0.3.1 - Apr 23 2019
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.2.1`, fixing an App Store submission error.
+ - Fix error thrown when adding a big number of listeners in Cordova.
+ - Refactor `build.gradle` to better respect `abiFilters` settings.
+
+### Commits
+ - [[`5cffbe6`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/5cffbe66ac6603be39cff076ec30ff3157af5ddc)] - plugin: patch node-pre-gyp libc replacement (Jaime Bernardo)
+ - [[`9bbb23c`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/9bbb23cfe18928b635e1fbc8b8b695bd211a79d3)] - core: update nodejs-mobile v0.2.1 (Jaime Bernardo)
+ - [[`50b33d3`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/50b33d3d3377402e5171ba8499c5e843ed48f9a9)] - plugin: don't call process.emitWarning in cordova (Jaime Bernardo)
+ - [[`41689bc`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/41689bc8a2d89445d792be5e1a977354021a8674)] - android: respect abiFilters in gradle files (Jaime Bernardo)
 
 <a id="0.3.0"></a>
 ## Version 0.3.0 - Apr 3 2019
