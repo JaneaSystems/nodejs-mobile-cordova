@@ -28,7 +28,7 @@ function createFileAndFolderLists(context, callback) {
   try {
     var cordovaLib = context.requireCordovaModule('cordova-lib');
     var platformAPI = cordovaLib.cordova_platforms.getPlatformApi('android');
-    var nodeJsProjectRoot = path.join('www', 'nodejs-project');
+    var nodeJsProjectRoot = 'www/nodejs-project';
     // The Android application's assets path will be the parent of the application's www folder.
     var androidAssetsPath = path.join(platformAPI.locations.www,'..');
     var fileListPath = path.join(androidAssetsPath,'file.list');
