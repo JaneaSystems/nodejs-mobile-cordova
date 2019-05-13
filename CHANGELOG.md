@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.3.2">0.3.2</a><br/>
 <a href="#0.3.1">0.3.1</a><br/>
 <a href="#0.3.0">0.3.0</a><br/>
 <a href="#0.2.5">0.2.5</a><br/>
@@ -22,6 +23,15 @@
 </td>
 </tr>
 </table>
+
+<a id="0.3.2"></a>
+## Version 0.3.2 - May 13 2019
+
+### Notable Changes
+ - Fix runtime error for applications built with Windows development machines.
+
+### Commits
+ - [[`ad33e6e`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/ad33e6e14326898501eadb6b24faed4e0da0b81a)] - android: use forward slash in file and dir lists (Jaime Bernardo)
 
 <a id="0.3.1"></a>
 ## Version 0.3.1 - Apr 23 2019
