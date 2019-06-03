@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.3.3">0.3.3</a><br/>
 <a href="#0.3.2">0.3.2</a><br/>
 <a href="#0.3.1">0.3.1</a><br/>
 <a href="#0.3.0">0.3.0</a><br/>
@@ -23,6 +24,15 @@
 </td>
 </tr>
 </table>
+
+<a id="0.3.3"></a>
+## Version 0.3.3 - June 3 2019
+
+### Notable Changes
+ - Update `nodejs-mobile-gyp` to `v0.3.1`, fixing a potential security issue.
+
+### Commits
+ - [[`987126b`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/987126b6d93c47ded6e152fb3deeb189feabf8cb)] - plugin: update nodejs-mobile-gyp to 0.3.1 (Jaime Bernardo)
 
 <a id="0.3.2"></a>
 ## Version 0.3.2 - May 13 2019
