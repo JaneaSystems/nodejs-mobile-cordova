@@ -38,22 +38,19 @@ function unzipAll(callback) {
 }
 
 module.exports = function(context) {
-  var Q = context.requireCordovaModule('q');
-  var deferral = new Q.defer();
-
   // Create the node project folder if it doesn't exist
   if (!fs.existsSync(nodeProjectFolder)) {
     fs.mkdirSync(nodeProjectFolder);
   }
 
-  // Unzip the libnode.so files for each architecture
-  unzipAll(function(err) {
-    if (err) {
-      deferral.reject(err);
-    } else {
-      deferral.resolve();
-    }
+  return new Promise((resolve, reject) => {
+    // Unzip the libnode.so files for each architecture
+    unzipAll(function(err) {
+        if (err) {
+        reject(err);
+        } else {
+        resolve();
+        }
+    });
   });
-
-  return deferral.promise;
 }

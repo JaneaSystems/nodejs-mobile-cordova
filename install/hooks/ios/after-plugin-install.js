@@ -2,7 +2,7 @@ var path = require('path');
 var fs = require('fs');
 
 module.exports = function(context) {
-  var xcode = context.requireCordovaModule('xcode');
+  var xcode = require('xcode');
 
   // Require the iOS platform Api to get the Xcode .pbxproj path.
   var iosPlatformPath = path.join(context.opts.projectRoot, 'platforms', 'ios');

@@ -50,16 +50,13 @@ module.exports = function(context) {
     return;
   }
 
-  var Q = context.requireCordovaModule('q');
-  var deferral = new Q.defer();
-
-  createFileAndFolderLists(context, function(err) {
-    if (err) {
-      deferral.reject(err);
-    } else {
-      deferral.resolve();
-    }
+  return new Promise((resolve, reject) => {
+    createFileAndFolderLists(context, function(err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
   });
-
-  return deferral.promise;
 }
