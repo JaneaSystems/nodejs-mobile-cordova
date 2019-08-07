@@ -2,7 +2,7 @@ var path = require('path');
 var fs = require('fs');
 
 module.exports = function(context) {
-  var xcode = context.requireCordovaModule('xcode');
+  var xcode = require('xcode');
 
   // Adds a custom function to remove script build phases, which is not supported on cordova's Xcode module yet.
   xcode.project.prototype.myRemovePbxScriptBuildPhase = function (buildPhaseName, target) {
