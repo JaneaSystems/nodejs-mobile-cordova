@@ -1,6 +1,6 @@
 {
   "name": "nodejs-mobile-cordova",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Node.js for Mobile Apps Cordova plugin",
   "cordova": {
     "id": "nodejs-mobile-cordova",

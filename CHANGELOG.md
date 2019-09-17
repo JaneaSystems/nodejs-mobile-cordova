@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.3.4">0.3.4</a><br/>
 <a href="#0.3.3">0.3.3</a><br/>
 <a href="#0.3.2">0.3.2</a><br/>
 <a href="#0.3.1">0.3.1</a><br/>
@@ -24,6 +25,15 @@
 </td>
 </tr>
 </table>
+
+<a id="0.3.4"></a>
+## Version 0.3.4 - September 17 2019
+
+### Notable Changes
+ - Fixes to allow installing the plugin with the Cordova CLI version 9.
+
+### Commits
+ - [[`72ede37`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/72ede371fcf110876f0ddfa176bc161dede0687d)] - plugin: fix to support Cordova 9 cli (hanieel rodriguez)
 
 <a id="0.3.3"></a>
 ## Version 0.3.3 - June 3 2019
