@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.3.5">0.3.5</a><br/>
 <a href="#0.3.4">0.3.4</a><br/>
 <a href="#0.3.3">0.3.3</a><br/>
 <a href="#0.3.2">0.3.2</a><br/>
@@ -25,6 +26,15 @@
 </td>
 </tr>
 </table>
+
+<a id="0.3.5"></a>
+## Version 0.3.5 - February 10 2020
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.2.2`. These binaries are built with Xcode 11 and Android NDK r20b, contain some minor fixes and are tested on iOS 13 / Android 10.
+
+### Commits
+ - [[`1b29a2e`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/1b29a2eb483738b3b4a7b9ab7458996d8226ef6e)] - core: update nodejs-mobile v0.2.2 (Jaime Bernardo)
 
 <a id="0.3.4"></a>
 ## Version 0.3.4 - September 17 2019
