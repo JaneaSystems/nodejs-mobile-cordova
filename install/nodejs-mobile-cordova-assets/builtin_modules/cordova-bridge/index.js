@@ -1,7 +1,7 @@
 'use strict';
 
 const EventEmitter = require('events');
-const NativeBridge = process.binding('cordova_bridge');
+const NativeBridge = process._linkedBinding('cordova_bridge');
 
 /**
  * Built-in events channel to exchange events between the Cordova app
