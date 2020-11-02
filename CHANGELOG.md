@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.4.2">0.4.2</a><br/>
 <a href="#0.4.1">0.4.1</a><br/>
 <a href="#0.4.0">0.4.0</a><br/>
 <a href="#0.3.5">0.3.5</a><br/>
@@ -28,6 +29,15 @@
 </td>
 </tr>
 </table>
+
+<a id="0.4.2"></a>
+## Version 0.4.2 - November 2 2020
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.3.2`, which updates the engine to `v12.19.0` LTS.
+
+### Commits
+ - [[`7b78448`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/7b78448f94fde7fdd0feb902130bf2ffbc5b97c9)] - core: update nodejs-mobile v0.3.2 (Jaime Bernardo)
 
 <a id="0.4.1"></a>
 ## Version 0.4.1 - May 25 2020
