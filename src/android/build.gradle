@@ -42,8 +42,6 @@ cdvPluginPostBuildExtras += { ->
     // The file that caches the value of NODEJS_MOBILE_BUILD_NATIVE_MODULES is not needed inside the APK.
     android.aaptOptions.ignoreAssetsPattern += ":!NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt";
 
-    android.sourceSets.main.jniLibs.srcDirs += 'libs/cdvnodejsmobile/libnode/bin/';
-
     String projectWWW; // www assets folder from the Application project.
     if ( file("${project.projectDir}/src/main/assets/www/").exists() ) {
         // www folder for cordova-android >= 7
