@@ -361,7 +361,7 @@ public class NodeJS extends CordovaPlugin {
 
   private boolean isEmptyNodeModules(){
     File nodejsModulesFolder = new File(NodeJS.filesDir + "/" + PROJECT_ROOT_MODULES);
-    return nodejsModulesFolder.exists();
+    return !nodejsModulesFolder.exists();
   }
 
   private boolean wasAPKUpdated() {
