@@ -35,6 +35,7 @@ public class NodeJS extends CordovaPlugin {
 
   private static String filesDir;
   private static final String PROJECT_ROOT = "www/nodejs-project";
+  private static final String PROJECT_ROOT_MODULES = "www/nodejs-project/node_modules";
   private static final String BUILTIN_ASSETS = "nodejs-mobile-cordova-assets";
   private static final String BUILTIN_MODULES = "nodejs-mobile-cordova-assets/builtin_modules";
   private static final String TRASH_DIR = "nodejs-project-trash";
@@ -103,7 +104,7 @@ public class NodeJS extends CordovaPlugin {
   }
 
   private void asyncInit() {
-    if (wasAPKUpdated()) {
+    if (wasAPKUpdated() || isEmptyNodeModules()) {
       try {
         initSemaphore.acquire();
         new Thread(new Runnable() {
@@ -356,6 +357,11 @@ public class NodeJS extends CordovaPlugin {
         ie.printStackTrace();
       }
     }
+  }
+
+  private boolean isEmptyNodeModules(){
+    File nodejsModulesFolder = new File(NodeJS.filesDir + "/" + PROJECT_ROOT_MODULES);
+    return nodejsModulesFolder.exists();
   }
 
   private boolean wasAPKUpdated() {
