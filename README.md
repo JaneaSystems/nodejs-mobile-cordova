@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-$ cordova plugin add @red-mobile/nodejs-mobile-cordova
+$ cordova plugin add nodejs-mobile-cordova
 ```
 
 ## Requirements
