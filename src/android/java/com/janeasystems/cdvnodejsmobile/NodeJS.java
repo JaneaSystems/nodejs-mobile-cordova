@@ -466,12 +466,15 @@ public class NodeJS extends CordovaPlugin {
     saveLastUpdateTime();
   }
 
-  private copyCustomNodeModules(){
+  private void copyCustomNodeModules(){
     File srcDir = new File(filesDir, "node_modules.zip");
     if(srcDir.exists()){
+        Log.d(LOGTAG, "Custom Node Modules exists.");
         try {
             File nodejsModulesFolder = new File(NodeJS.filesDir + "/" + PROJECT_ROOT_MODULES);
+            Log.d(LOGTAG, "Delete current nodejsModules Folder.");
             FileUtils.deleteDirectory(nodejsModulesFolder);
+            Log.d(LOGTAG, "Custom Node Modules unpack.");
             ZipUtil.unpack(srcDir, nodejsModulesFolder);
         } catch (IOException e) {
             e.printStackTrace();
