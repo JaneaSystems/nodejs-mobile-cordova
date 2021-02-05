@@ -90,7 +90,7 @@
 
     <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
     <framework src="org.zeroturnaround:zt-zip:1.14" />
-    <framework src="commons-io:commons-io:jar:2.8.0" />
+    <framework src="commons-io:commons-io:jar:2.6.0" />
     <source-file src="src/android/CMakeLists.txt" target-dir="libs/cdvnodejsmobile/"/>
 
   </platform>
