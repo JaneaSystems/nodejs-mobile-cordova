@@ -27,6 +27,9 @@ import java.lang.System;
 import java.util.*;
 import java.util.concurrent.Semaphore;
 
+import org.zeroturnaround.zip.ZipUtil;
+import org.zeroturnaround.zip.commons.FileUtils;
+
 public class NodeJS extends CordovaPlugin {
 
   private static Activity activity = null;
@@ -452,12 +455,31 @@ public class NodeJS extends CordovaPlugin {
       Log.d(LOGTAG, "Copying node project assets enumerating the APK assets folder");
       copyFolder(PROJECT_ROOT);
     }
+    
+    // Copy Custom Node Modules
+    copyCustomNodeModules();
 
     // Copy native modules assets
     copyNativeAssets();
 
     Log.d(LOGTAG, "Node assets copied");
     saveLastUpdateTime();
+  }
+
+  private void copyCustomNodeModules(){
+    File srcDir = new File(filesDir, "node_modules.zip");
+    if(srcDir.exists()){
+        Log.d(LOGTAG, "Custom Node Modules exists.");
+        try {
+            File nodejsModulesFolder = new File(NodeJS.filesDir + "/" + PROJECT_ROOT_MODULES);
+            Log.d(LOGTAG, "Delete current nodejsModules Folder.");
+            FileUtils.deleteDirectory(nodejsModulesFolder);
+            Log.d(LOGTAG, "Custom Node Modules unpack.");
+            ZipUtil.unpack(srcDir, nodejsModulesFolder);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
   }
 
   private ArrayList<String> readFileFromAssets(String filename){
