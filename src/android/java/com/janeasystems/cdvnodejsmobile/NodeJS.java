@@ -153,7 +153,7 @@ public class NodeJS extends CordovaPlugin {
       JSONObject startOptions = data.getJSONObject(1);
       this.startEngineWithScript(scriptBody, startOptions, callbackContext);
     } else if (action.equals("reset")) {
-      this.setReset(callbackContext);
+      this.setReset();
     } else {
       Log.e(LOGTAG, "Invalid action: " + action);
       return false;
@@ -370,12 +370,12 @@ public class NodeJS extends CordovaPlugin {
     return !nodejsModulesFolder.exists();
   }
 
-  private void setReset(CallbackContext callbackContext) {
+  private void setReset() {
     SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putBoolean(FORCE_RESET, true);
     editor.commit();
-    sendResult(true, "Reset done.", callbackContext);
+    doColdRestart();
   }
 
   private void clearReset() {
@@ -602,5 +602,55 @@ public class NodeJS extends CordovaPlugin {
       }
     }
     return result;
+  }
+
+  /**
+    * Performs a full cold app restart - restarts application
+    * https://stackoverflow.com/a/22345538/777265
+  */
+  protected void doColdRestart() {
+      String baseError = "Unable to cold restart application: ";
+      try {
+          logInfo("Cold restarting application");
+          Context c = applicationContext;
+          //check if the context is given
+          if (c != null) {
+              //fetch the packagemanager so we can get the default launch activity
+              // (you can replace this intent with any other activity if you want
+              PackageManager pm = c.getPackageManager();
+              //check if we got the PackageManager
+              if (pm != null) {
+                  //create the intent with the default start activity for your application
+                  Intent mStartActivity = pm.getLaunchIntentForPackage(
+                          c.getPackageName()
+                  );
+                  if (mStartActivity != null) {
+                      //mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                      //create a pending intent so the application is restarted after System.exit(0) was called.
+                      // We use an AlarmManager to call this intent in 100ms
+                      // int mPendingIntentId = 223344;
+                      // PendingIntent mPendingIntent = PendingIntent
+                      //         .getActivity(c, mPendingIntentId, mStartActivity,
+                      //                 PendingIntent.FLAG_CANCEL_CURRENT);
+                      // AlarmManager mgr = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
+                      // mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                      mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                      c.getApplicationContext().startActivity(mStartActivity);
+
+                      Log.i(TAG,"Killing application for cold restart");
+                      //kill the application
+                      System.exit(0);
+                  } else {
+                    Log.e(LOGTAG, baseError + "StartActivity is null");
+                  }
+              } else {
+                  Log.e(LOGTAG, baseError + "PackageManager is null");
+              }
+          } else {
+              Log.e(LOGTAG, baseError + "Context is null");
+          }
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
   }
 }
