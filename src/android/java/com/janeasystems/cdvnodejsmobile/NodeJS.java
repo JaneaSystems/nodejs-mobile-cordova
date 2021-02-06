@@ -50,6 +50,7 @@ public class NodeJS extends CordovaPlugin {
 
   private static final String SHARED_PREFS = "NODEJS_MOBILE_PREFS";
   private static final String LAST_UPDATED_TIME = "NODEJS_MOBILE_APK_LastUpdateTime";
+  private static final String FORCE_RESET = "NODEJS_MOBILE_RESET";
   private long lastUpdateTime = 1;
   private long previousLastUpdateTime = 0;
 
@@ -107,7 +108,7 @@ public class NodeJS extends CordovaPlugin {
   }
 
   private void asyncInit() {
-    if (wasAPKUpdated() || isEmptyNodeModules()) {
+    if (wasAPKUpdated() || isReset()) {
       try {
         initSemaphore.acquire();
         new Thread(new Runnable() {
@@ -151,6 +152,8 @@ public class NodeJS extends CordovaPlugin {
       String scriptBody = data.getString(0);
       JSONObject startOptions = data.getJSONObject(1);
       this.startEngineWithScript(scriptBody, startOptions, callbackContext);
+    } else if (action.equals("reset")) {
+      this.setReset(callbackContext);
     } else {
       Log.e(LOGTAG, "Invalid action: " + action);
       return false;
@@ -365,6 +368,28 @@ public class NodeJS extends CordovaPlugin {
   private boolean isEmptyNodeModules(){
     File nodejsModulesFolder = new File(NodeJS.filesDir + "/" + PROJECT_ROOT_MODULES);
     return !nodejsModulesFolder.exists();
+  }
+
+  private void setReset(CallbackContext callbackContext) {
+    SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putBoolean(FORCE_RESET, true);
+    editor.commit();
+    sendResult(true, "Reset done.", callbackContext);
+  }
+
+  private void clearReset() {
+    SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.remove(FORCE_RESET);
+    editor.commit();
+  }
+
+  private void isReset() {
+    SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+    boolean result = prefs.getBoolean(FORCE_RESET, false);
+    clearReset();
+    return result;
   }
 
   private boolean wasAPKUpdated() {
