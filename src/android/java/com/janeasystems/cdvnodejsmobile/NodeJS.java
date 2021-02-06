@@ -613,7 +613,7 @@ public class NodeJS extends CordovaPlugin {
       String baseError = "Unable to cold restart application: ";
       try {
           Log.d(LOGTAG, "Cold restarting application");
-          Context c = applicationContext;
+          Context c = context;
           //check if the context is given
           if (c != null) {
               //fetch the packagemanager so we can get the default launch activity
