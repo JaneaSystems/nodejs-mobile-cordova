@@ -15,6 +15,7 @@ import org.json.JSONException;
 import android.util.Log;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -385,7 +386,7 @@ public class NodeJS extends CordovaPlugin {
     editor.commit();
   }
 
-  private void isReset() {
+  private boolean isReset() {
     SharedPreferences prefs = context.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
     boolean result = prefs.getBoolean(FORCE_RESET, false);
     clearReset();
@@ -611,7 +612,7 @@ public class NodeJS extends CordovaPlugin {
   protected void doColdRestart() {
       String baseError = "Unable to cold restart application: ";
       try {
-          logInfo("Cold restarting application");
+          Log.d(LOGTAG, "Cold restarting application");
           Context c = applicationContext;
           //check if the context is given
           if (c != null) {
@@ -637,7 +638,7 @@ public class NodeJS extends CordovaPlugin {
                       mStartActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                       c.getApplicationContext().startActivity(mStartActivity);
 
-                      Log.i(TAG,"Killing application for cold restart");
+                      Log.i(LOGTAG,"Killing application for cold restart");
                       //kill the application
                       System.exit(0);
                   } else {
