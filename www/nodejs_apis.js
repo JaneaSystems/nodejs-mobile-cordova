@@ -142,11 +142,16 @@ function startWithScript(script, callback, options) {
   startEngine('startEngineWithScript', [script, options], callback);
 };
 
+function reset(callback) {
+  startEngine('reset', [], callback);
+};
+
 const eventChannel = new EventChannel(EVENT_CHANNEL);
 registerChannel(eventChannel);
 
 module.exports = exports = {
   start,
   startWithScript,
+  reset,
   channel: eventChannel
 };
