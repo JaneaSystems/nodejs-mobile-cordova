@@ -8,9 +8,9 @@ $ cordova plugin add nodejs-mobile-cordova
 
 ## Requirements
 
- - Cordova 7.x or higher
+ - Cordova 9.x or higher
  - iOS 11 or higher
- - Android API 21 or higher
+ - Android API 22 or higher
 
 When building an application for the Android platform, make sure you have the [Android NDK](https://developer.android.com/ndk/index.html) installed and the environment variable `ANDROID_NDK_HOME` set, for example:
 ```bash
