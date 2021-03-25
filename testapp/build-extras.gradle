@@ -1,0 +1,10 @@
+ext.cdvMinSdkVersion = 22
+
+android {
+    packagingOptions {
+        pickFirst 'lib/x86/libnode.so'
+        pickFirst 'lib/armeabi-v7a/libnode.so'
+        pickFirst 'lib/arm64-v8a/libnode.so'
+        pickFirst 'lib/x86_64/libnode.so'
+    }
+}
