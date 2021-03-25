@@ -74,10 +74,6 @@
       <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     </config-file>
 
-    <edit-config file="AndroidManifest.xml" target="/manifest/uses-sdk" mode="merge">
-      <uses-sdk android:minSdkVersion="21" />
-    </edit-config>
-
     <source-file src="src/android/java/com/janeasystems/cdvnodejsmobile/NodeJS.java" target-dir="src/com/janeasystems/cdvnodejsmobile/" />
 
     <source-file src="src/common/cordova-bridge/cordova-bridge.h" target-dir="libs/cdvnodejsmobile/" />
