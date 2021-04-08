@@ -7,7 +7,7 @@ jobs:
     steps:
     - run: |
         echo "Installing Cordova!"
-        npm i Cordova@10.0.0 -g
+        npm i cordova@10.0.0 -g
         echo "Installing the npm dependencies!"
         cd testapp
         npm i
