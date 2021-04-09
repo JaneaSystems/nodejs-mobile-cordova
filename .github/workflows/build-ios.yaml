@@ -1,4 +1,4 @@
-name: Build IOS
+name: Build IOS Project
 on:
   push:
     branches: [ unstable ]
