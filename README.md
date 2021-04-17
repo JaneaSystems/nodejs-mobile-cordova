@@ -221,7 +221,7 @@ You can either manually create the `./www/nodejs-project/` folder, the `./www/no
 #### Set up project files using the helper script
 If you choose to use the helper script, you will be asked to overwrite the existing `./www/js/index.js` file:
 ```bash
-$ ./plugins/nodejs-mobile-cordova/install/sample-project/copy-sample-project.sh
+$ ./plugins/@red-mobile/nodejs-mobile-cordova/install/sample-project/copy-sample-project.sh
 $ overwrite www/js/index.js? (y/n [n]) y
 ```
 The script creates the `./www/nodejs-project/` folder and adds two files:
@@ -331,7 +331,7 @@ The Node modules have to be installed in the `./www/nodejs-project/` folder and 
 
 If you used the helper script to install the sample project, the `package.json` file is already present and you can proceed adding the desired Node modules.
 
-If you don't know how to create the `package.json` file, just copy the sample one from `./plugins/nodejs-mobile-cordova/install/sample-project/www/nodejs-project/package.json`.
+If you don't know how to create the `package.json` file, just copy the sample one from `./plugins/@red-mobile/nodejs-mobile-cordova/install/sample-project/www/nodejs-project/package.json`.
 Then proceed with the installation of the Node modules you want to add to your Node.js project:
 ```
 $ cd www/nodejs-project/

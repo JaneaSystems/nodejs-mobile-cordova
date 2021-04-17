@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-           id="nodejs-mobile-cordova"
-      version="0.4.3">
+           id="@red-mobile/nodejs-mobile-cordova"
+      version="0.4.7">
 
   <name>Node.js Mobile</name>
   <description>Node.js for Mobile Apps Cordova Plugin</description>
@@ -41,7 +41,7 @@
     <header-file src="src/ios/CDVNodeJS.hh" />
     <source-file src="src/ios/CDVNodeJS.mm" />
     <header-file src="src/common/cordova-bridge/cordova-bridge.h" />
-    <source-file src="src/common/cordova-bridge/cordova-bridge.cpp" compiler-flags="-I$(SRCROOT)/$(PRODUCT_NAME)/Plugins/nodejs-mobile-cordova/include/node/"/>
+    <source-file src="src/common/cordova-bridge/cordova-bridge.cpp" compiler-flags="-I$(SRCROOT)/$(PRODUCT_NAME)/Plugins/@red-mobile/nodejs-mobile-cordova/include/node/"/>
     <header-file src="src/ios/NodeJSRunner.hh" />
     <source-file src="src/ios/NodeJSRunner.mm" />
     <header-file src="libs/ios/nodemobile/include"/>

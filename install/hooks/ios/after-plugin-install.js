@@ -52,14 +52,14 @@ find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name "*.framework" -type d 
 find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -path "*/.bin/*" -delete
 find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name ".bin" -type d -delete
 # Get the nodejs-mobile-gyp location
-if [ -d "$PROJECT_DIR/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/" ]; then
-NODEJS_MOBILE_GYP_DIR="$( cd "$PROJECT_DIR" && cd ../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/ && pwd )"
+if [ -d "$PROJECT_DIR/../../plugins/@red-mobile/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/" ]; then
+NODEJS_MOBILE_GYP_DIR="$( cd "$PROJECT_DIR" && cd ../../plugins/@red-mobile/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/ && pwd )"
 else
 NODEJS_MOBILE_GYP_DIR="$( cd "$PROJECT_DIR" && cd ../../node_modules/nodejs-mobile-gyp/ && pwd )"
 fi
 NODEJS_MOBILE_GYP_BIN_FILE="$NODEJS_MOBILE_GYP_DIR"/bin/node-gyp.js
 # Rebuild modules with right environment
-NODEJS_HEADERS_DIR="$( cd "$( dirname "$PRODUCT_SETTINGS_PATH" )" && cd Plugins/nodejs-mobile-cordova/ && pwd )"
+NODEJS_HEADERS_DIR="$( cd "$( dirname "$PRODUCT_SETTINGS_PATH" )" && cd Plugins/@red-mobile/nodejs-mobile-cordova/ && pwd )"
 # Adds the original project .bin to the path. It's a workaround
 # to correctly build some modules that depend on symlinked modules,
 # like node-pre-gyp.
@@ -115,7 +115,7 @@ if [ "1" != "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then exit 0; fi
 find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name "*.o" -type f -delete
 find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name "*.a" -type f -delete
 # Create Info.plist for each framework built and loader override.
-PATCH_SCRIPT_DIR="$( cd "$PROJECT_DIR" && cd ../../Plugins/nodejs-mobile-cordova/install/helper-scripts/ && pwd )"
+PATCH_SCRIPT_DIR="$( cd "$PROJECT_DIR" && cd ../../Plugins/@red-mobile/nodejs-mobile-cordova/install/helper-scripts/ && pwd )"
 NODEJS_PROJECT_DIR="$( cd "$CODESIGNING_FOLDER_PATH" && cd www/nodejs-project/ && pwd )"
 node "$PATCH_SCRIPT_DIR"/ios-create-plists-and-dlopen-override.js $NODEJS_PROJECT_DIR
 # Embed every resulting .framework in the application and delete them afterwards.

@@ -227,8 +227,8 @@ cdvPluginPostBuildExtras += { ->
                 environment ('npm_config_node_engine', 'v8' )
                 environment ('npm_config_nodedir', "${project.projectDir}/libs/cdvnodejsmobile/libnode/" )
                 String npm_gyp_path_to_use;
-                if( file("${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
-                    npm_gyp_path_to_use = "${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
+                if( file("${rootProject.projectDir}/../../plugins/@red-mobile/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
+                    npm_gyp_path_to_use = "${rootProject.projectDir}/../../plugins/@red-mobile/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
                 } else {
                     npm_gyp_path_to_use = "${rootProject.projectDir}/../../node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
                 }

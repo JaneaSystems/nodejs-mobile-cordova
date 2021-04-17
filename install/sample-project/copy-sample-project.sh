@@ -1,5 +1,5 @@
 #!/bin/sh
-SRC_PATH="plugins/nodejs-mobile-cordova/install/sample-project"
+SRC_PATH="plugins/@red-mobile/nodejs-mobile-cordova/install/sample-project"
 
 copySampleFile () {
   cp -i "$SRC_PATH/$1" $1
