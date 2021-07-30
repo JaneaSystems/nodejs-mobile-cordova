@@ -35,7 +35,6 @@ android {
 }
 
 import org.gradle.internal.os.OperatingSystem;
-import org.gradle.util.GradleVersion;
 
 cdvPluginPostBuildExtras += { ->
     if (android.defaultConfig.ndk.abiFilters == null) {
@@ -51,9 +50,7 @@ cdvPluginPostBuildExtras += { ->
     // The file that caches the value of NODEJS_MOBILE_BUILD_NATIVE_MODULES is not needed inside the APK.
     android.aaptOptions.ignoreAssetsPattern += ":!NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt";
 
-    if (GradleVersion.current() < GradleVersion.version("4.0")) {
-        android.sourceSets.main.jniLibs.srcDirs += 'libs/cdvnodejsmobile/libnode/bin/';
-    }
+    android.sourceSets.main.jniLibs.srcDirs += 'libs/cdvnodejsmobile/libnode/bin/';
 
     String projectWWW; // www assets folder from the Application project.
     if ( file("${project.projectDir}/src/main/assets/www/").exists() ) {
