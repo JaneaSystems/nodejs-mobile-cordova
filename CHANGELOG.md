@@ -6,6 +6,7 @@
 </tr>
 <tr>
 <td>
+<a href="#0.4.3">0.4.3</a><br/>
 <a href="#0.4.2">0.4.2</a><br/>
 <a href="#0.4.1">0.4.1</a><br/>
 <a href="#0.4.0">0.4.0</a><br/>
@@ -29,6 +30,20 @@
 </td>
 </tr>
 </table>
+
+<a id="0.4.3"></a>
+## Version 0.4.3 - August 16 2021
+
+### Notable Changes
+ - Update `nodejs-mobile` binaries to `v0.3.3`, fixing bugs on newer versions of the OSes.
+ - iOS binaries now use .xcframework, supporting Xcode new build system.
+ - Support Cordova 10 and new Gradle versions.
+
+### Commits
+ - [[`7951c0c`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/7951c0c3cb055cf65290626f4e38d662a199fb36)] - ios: support libnode .xcframework format (Jaime Bernardo)
+ - [[`94022b3`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/94022b35765a7d3beca534cf2d8e76d77e1154a5)] - core: update nodejs-mobile v0.3.3 (Jaime Bernardo)
+ - [[`a917c6d`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/a917c6d3b859b1579164feb15eeb02c8cbf17e75)] - plugin: fix to support Cordova 10 and new Gradle (#12) (Hiroyuki Okada)
+ - [[`80ba48c`](https://github.com/janeasystems/nodejs-mobile-cordova/commit/80ba48c4b0010a30a431db0ab957ce470bcfa286)] - plugin: fix to work with cordova@10.0.0 (#13) (${Mr.DJA})
 
 <a id="0.4.2"></a>
 ## Version 0.4.2 - November 2 2020

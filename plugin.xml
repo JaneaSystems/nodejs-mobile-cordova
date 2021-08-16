@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="nodejs-mobile-cordova"
-      version="0.4.2">
+      version="0.4.3">
 
   <name>Node.js Mobile</name>
   <description>Node.js for Mobile Apps Cordova Plugin</description>
