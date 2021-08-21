@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="@red-mobile/nodejs-mobile-cordova"
-      version="0.4.7">
+      version="0.4.8">
 
   <name>Node.js Mobile</name>
   <description>Node.js for Mobile Apps Cordova Plugin</description>
@@ -28,6 +28,10 @@
     <hook type="before_plugin_install" src="install/hooks/ios/before-plugin-install.js" />
     <hook type="after_plugin_install" src="install/hooks/ios/after-plugin-install.js" />
     <hook type="before_plugin_uninstall" src="install/hooks/ios/before-plugin-uninstall.js" />
+    <hook type="after_platform_add" src="install/hooks/ios/fix-xcframework-path.js" />
+    <hook type="after_plugin_add" src="install/hooks/ios/fix-xcframework-path.js" />
+    <hook type="after_plugin_install" src="install/hooks/ios/fix-xcframework-path.js" />
+    <hook type="after_prepare" src="install/hooks/ios/fix-xcframework-path.js" />
     <hook type="after_prepare" src="install/hooks/both/after-prepare-patch-npm-packages.js" />
     <hook type="after_prepare" src="install/hooks/both/after-prepare-native-modules-preference.js" />
 
@@ -48,8 +52,8 @@
 
     <asset src="install/nodejs-mobile-cordova-assets" target="nodejs-mobile-cordova-assets" />
 
-    <framework src="libs/ios/nodemobile/NodeMobile.framework" custom="true" embed="true" />
-    <framework src="libs/ios/nodemobile/NodeMobile.framework" />
+    <framework src="libs/ios/nodemobile/NodeMobile.xcframework" custom="true" embed="true" />
+    <framework src="libs/ios/nodemobile/NodeMobile.xcframework" />
 
   </platform>
 

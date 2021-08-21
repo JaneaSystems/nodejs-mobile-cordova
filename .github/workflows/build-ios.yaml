@@ -1,0 +1,32 @@
+name: Build IOS Project
+on:
+  push:
+    branches: [ unstable ]
+  pull_request:
+    branches: [ unstable ]
+
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+    - name: Clone repo
+      uses: actions/checkout@v2
+    - name: Installing Cordova!
+      run: |
+        sudo npm i cordova@10.0.0 -g
+    - name: Installing the npm dependencies!
+      run: |
+        cd testapp
+        npm i
+    - name: Copying nodejs-mobile-cordova plugin
+      run: |
+        cd testapp
+        npm run copy-module
+    - name: Preparing the IOS project!
+      run: |
+        cd testapp
+        cordova prepare ios
+    - name: Building the ISO project!
+      run: |
+        cd testapp
+        cordova build ios
