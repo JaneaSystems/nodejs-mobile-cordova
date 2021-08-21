@@ -1,6 +1,6 @@
 {
   "name": "@red-mobile/nodejs-mobile-cordova",
-  "version": "0.4.8",
+  "version": "0.4.7",
   "description": "Node.js for Mobile Apps Cordova plugin",
   "cordova": {
     "id": "@red-mobile/nodejs-mobile-cordova",
