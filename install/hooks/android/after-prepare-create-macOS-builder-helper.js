@@ -14,7 +14,6 @@ function getPlatformWWWPath(context, platform) {
   return platformAPIInstance.locations.www;
 }
 
-
 // Adds a helper script to run "npm rebuild" with the current PATH.
 // This workaround is needed for Android Studio on macOS when it is not started
 // from the command line, as npm probably won't be in the PATH at build time.
