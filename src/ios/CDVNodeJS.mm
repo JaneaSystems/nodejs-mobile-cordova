@@ -343,7 +343,7 @@ id appPauseEventsManagerSetLock = [[NSObject alloc] init];
     NSArray* arguments = nil;
     NSString* dlopenoverridePath = [[NSBundle mainBundle] pathForResource:[NSString stringWithFormat:@"%@/%@", NODE_ROOT, NODEJS_DLOPEN_OVERRIDE_FILENAME] ofType:@""];
     // Check if the file to override dlopen lookup exists, for loading native modules from the Frameworks.
-    if(!dlopenoverridePath) {
+    if(dlopenoverridePath) {
       arguments = [NSArray arrayWithObjects:
                     @"node",
                     @"-r",
