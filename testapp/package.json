@@ -16,7 +16,6 @@
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-whitelist": {},
       "nodejs-mobile-cordova": {},
       "nodejs-mobile-cordova-tests": {}
     },
