@@ -3,7 +3,7 @@ var targz2 = require('tar.gz2');
 
 const nodeProjectFolder = 'www/nodejs-project';
 const nodeMobileFolderPath = 'plugins/nodejs-mobile-cordova/libs/ios/nodemobile/';
-const nodeMobileFileName = 'NodeMobile.framework';
+const nodeMobileFileName = 'NodeMobile.xcframework';
 const nodeMobileFilePath = nodeMobileFolderPath + nodeMobileFileName;
 const zipFileName = nodeMobileFileName + '.tar.zip';
 const zipFilePath = nodeMobileFolderPath + zipFileName

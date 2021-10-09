@@ -50,13 +50,17 @@ function visitPackageJSON(folderPath)
 }
 
 // Applies the patch to the selected platform
-function patchTargetPlatform(context, platform)
-{
-  var platformPath = path.join(context.opts.projectRoot, 'platforms', platform);
-  var platformAPI = require(path.join(platformPath, 'cordova', 'Api'));
-  var platformAPIInstance = new platformAPI();
-  var wwwPath = platformAPIInstance.locations.www;
-  var nodeModulesPathToPatch = path.join(wwwPath, 'nodejs-project', 'node_modules');
+function patchTargetPlatform(context, platform) {
+  const platformPath = path.join(context.opts.projectRoot, 'platforms', platform);
+  const platformAPI = require(path.join(platformPath, 'cordova', 'Api'));
+  let platformAPIInstance;
+  try {
+    platformAPIInstance = new platformAPI();
+  } catch (e) {
+    platformAPIInstance = new platformAPI(platform, platformPath);
+  }
+  const wwwPath = platformAPIInstance.locations.www;
+  const nodeModulesPathToPatch = path.join(wwwPath, 'nodejs-project', 'node_modules');
   if (fs.existsSync(nodeModulesPathToPatch)) {
     visitPackageJSON(nodeModulesPathToPatch);
   }
