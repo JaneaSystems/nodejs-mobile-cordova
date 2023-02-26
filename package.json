@@ -1,11 +1,10 @@
 {
   "name": "@red-mobile/nodejs-mobile-cordova",
-  "version": "0.5.0-alpha.5",
+  "version": "0.5.0-rc.0",
   "description": "Node.js for Mobile Apps Cordova plugin",
   "cordova": {
     "id": "@red-mobile/nodejs-mobile-cordova",
     "platforms": [
-      "ios",
       "android"
     ]
   },
@@ -16,7 +15,6 @@
     "node.js",
     "nodejs-mobile",
     "ecosystem:cordova",
-    "cordova-ios",
     "cordova-android"
   ],
   "author": "janeasystems",
@@ -37,7 +35,6 @@
   "engines": {
     "cordovaDependencies": {
       ">=0.1.0": {
-        "cordova-ios": ">=4.4.0",
         "cordova-android": ">=6.2.1"
       }
     }
