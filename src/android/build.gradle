@@ -1,4 +1,4 @@
-ext.cdvMinSdkVersion = 22
+ext.cdvMinSdkVersion = 24
 
 buildscript {
     repositories {
