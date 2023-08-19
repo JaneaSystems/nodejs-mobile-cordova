@@ -8,8 +8,8 @@
 
 ## Requirements
 
-- Cordova 9.x or higher
-- Android API 22 or higher
+- Cordova 12.x or higher
+- Android API 24 or higher
 
 When building an application for the Android platform, make sure you have the [Android NDK](https://developer.android.com/ndk/index.html) installed and the environment variable `ANDROID_NDK_HOME` set, for example:
 
