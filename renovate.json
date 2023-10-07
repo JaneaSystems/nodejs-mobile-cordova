@@ -25,6 +25,10 @@
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "stabilityDays": 3,
       "prCreation": "not-pending"
+    },
+    {
+      "enabled": false,
+      "matchPackageNames": ["xcode", "cordova-ios"]
     }
   ]
 }
