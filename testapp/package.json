@@ -7,17 +7,15 @@
   "author": "janeasystems",
   "license": "MIT",
   "scripts": {
-    "copy-module": "node copy-module-from-parent.js"
+    "postprepare": "node copy-module-from-parent.js"
   },
   "dependencies": {
-    "cordova-android": "^9.0.0",
+    "cordova-android": "12.0.0",
     "cordova-ios": "^6.2.0",
-    "cordova-plugin-whitelist": "^1.3.4",
-    "recursive-copy": "^2.0.9"
+    "recursive-copy": "2.0.14"
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-whitelist": {},
       "nodejs-mobile-cordova": {},
       "nodejs-mobile-cordova-tests": {}
     },

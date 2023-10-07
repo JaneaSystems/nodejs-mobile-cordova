@@ -24,7 +24,6 @@
     </platform>
     <engine name="android" spec="^7.1.4" />
     <engine name="ios" spec="^4.5.5" />
-    <plugin name="cordova-plugin-whitelist" spec="^1.3.3" />
     <plugin name="nodejs-mobile-cordova" spec="temp-module-copy/" />
     <plugin name="nodejs-mobile-cordova-tests" spec="temp-module-copy/tests/" />
 </widget>

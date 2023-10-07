@@ -1,12 +1,15 @@
 {
   "name": "@red-mobile/nodejs-mobile-cordova",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Node.js for Mobile Apps Cordova plugin",
   "cordova": {
     "id": "@red-mobile/nodejs-mobile-cordova",
     "platforms": [
       "android"
     ]
+  },
+  "scripts": {
+    "test:android": "cd testapp && npm i && cordova prepare android && cordova build"
   },
   "keywords": [
     "cordova",
@@ -34,9 +37,9 @@
   },
   "engines": {
     "cordovaDependencies": {
-       "2.0.0": {
-         "cordova-android": ">=12.0.0"
-       }
+      "2.0.0": {
+        "cordova-android": ">=12.0.0"
+      }
     }
   }
 }
