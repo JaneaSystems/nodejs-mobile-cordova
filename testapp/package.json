@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "cordova-android": "12.0.0",
-    "cordova-ios": "^6.2.0",
+    "cordova-ios": "6.3.0",
     "recursive-copy": "2.0.14"
   },
   "cordova": {
