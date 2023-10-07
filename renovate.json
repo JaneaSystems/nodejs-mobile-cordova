@@ -1,0 +1,29 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":prHourlyLimitNone",
+    ":prConcurrentLimitNone",
+    ":timezone(Asia/Tokyo)"
+  ],
+  "rangeStrategy": "pin",
+  "major": {
+    "automerge": false
+  },
+  "nodenv": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true
+  },
+  "automergeSchedule": ["before 2am"],
+  "packageRules": [
+    {
+      "automerge": true,
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "stabilityDays": 3,
+      "prCreation": "not-pending"
+    }
+  ]
+}
