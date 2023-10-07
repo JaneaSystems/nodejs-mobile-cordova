@@ -1,0 +1,29 @@
+name: Build Android Project
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clone repo
+      uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version-file: '.node-version'
+    - name: set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: "temurin"
+        java-version: "11"
+    - name: Installing Cordova!
+      run: |
+        sudo npm i cordova -g
+    - name: npm install, build, and test
+      run: |
+        npm run test:android --if-present
+      env:
+        CI: true
