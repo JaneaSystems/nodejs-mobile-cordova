@@ -6,7 +6,7 @@
     ":prConcurrentLimitNone",
     ":timezone(Asia/Tokyo)"
   ],
-  "renovateFork": true,
+  "includeForks": true,
   "rangeStrategy": "pin",
   "major": {
     "automerge": false
