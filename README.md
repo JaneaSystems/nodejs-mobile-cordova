@@ -41,46 +41,46 @@ These methods can be called from the Cordova javascript code directly:
 
 ### nodejs.start(scriptFileName, callback [, options])
 
-| Param | Type |
-| --- | --- |
-| scriptFileName | `string` |
-| callback | `function`  |
-| options | `[StartupOptions](#cordova.StartupOptions)`  |
+| Param          | Type                                        |
+| -------------- | ------------------------------------------- |
+| scriptFileName | `string`                                    |
+| callback       | `function`                                  |
+| options        | `[StartupOptions](#cordova.StartupOptions)` |
 
 Starts the nodejs-mobile runtime thread with a file inside the `nodejs-project` directory.
 
 ### nodejs.startWithScript(scriptBody, callback [, options])
 
-| Param | Type |
-| --- | --- |
-| scriptBody | `string` |
-| callback | `function`  |
-| options | `[StartupOptions](#cordova.StartupOptions)`  |
+| Param      | Type                                        |
+| ---------- | ------------------------------------------- |
+| scriptBody | `string`                                    |
+| callback   | `function`                                  |
+| options    | `[StartupOptions](#cordova.StartupOptions)` |
 
 Starts the nodejs-mobile runtime thread with a script body.
 
 ### nodejs.channel.on(event, callback)
 
-| Param | Type |
-| --- | --- |
-| event | `string` |
+| Param    | Type                                   |
+| -------- | -------------------------------------- |
+| event    | `string`                               |
 | callback | `[function](#cordova.channelCallback)` |
 
 Registers a callback for user-defined events raised from the nodejs-mobile side.
 
 ### nodejs.channel.post(event, message)
 
-| Param | Type |
-| --- | --- |
-| event | `string` |
+| Param   | Type                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------- |
+| event   | `string`                                                                                    |
 | message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
 
 Raises a user-defined event on the nodejs-mobile side.
 
 ### nodejs.channel.setListener(listenerCallback)
 
-| Param | Type |
-| --- | --- |
+| Param            | Type                                   |
+| ---------------- | -------------------------------------- |
 | listenerCallback | `[function](#cordova.channelCallback)` |
 
 Registers a callback for 'message' events raised from the nodejs-mobile side.
@@ -88,8 +88,8 @@ It is an alias for `nodejs.channel.on('message', listenerCallback);`.
 
 ### nodejs.channel.send(message)
 
-| Param | Type |
-| --- | --- |
+| Param   | Type                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------- |
 | message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
 
 Raises a 'message' event on the nodejs-mobile side.
@@ -97,9 +97,9 @@ It is an alias for `nodejs.channel.post('message', message);`.
 
 ### StartupOptions: `object`
 
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| redirectOutputToLogcat | `boolean` | `true` | Allows to disable the redirection of the Node stdout/stderr to the Android logcat |
+| Name                   | Type      | Default | Description                                                                       |
+| ---------------------- | --------- | ------- | --------------------------------------------------------------------------------- |
+| redirectOutputToLogcat | `boolean` | `true`  | Allows to disable the redirection of the Node stdout/stderr to the Android logcat |
 
 Note: the stdout/stderr redirection is applied to the whole application, the side effect is that some undesired/duplicated output may appear in the logcat.
 For example, the Chromium console output `I/chromium: [INFO:CONSOLE(xx)]` is also sent to stderr and will show up in logcat has well, with the `NODEJS-MOBILE` log tag.
@@ -109,7 +109,7 @@ For example, the Chromium console output `I/chromium: [INFO:CONSOLE(xx)]` is als
 The following methods can be called from the Node javascript code through the `cordova-bridge` module:
 
 ```js
-  var cordova = require('cordova-bridge');
+var cordova = require("cordova-bridge");
 ```
 
 - `cordova.channel.on`
@@ -122,9 +122,9 @@ The following methods can be called from the Node javascript code through the `c
 
 ### cordova.channel.on(event, callback)
 
-| Param | Type |
-| --- | --- |
-| event | `string` |
+| Param    | Type                                   |
+| -------- | -------------------------------------- |
+| event    | `string`                               |
 | callback | `[function](#cordova.channelCallback)` |
 
 Registers a callback for user-defined events raised from the cordova side.
@@ -132,22 +132,22 @@ Registers a callback for user-defined events raised from the cordova side.
 > To receive messages from `nodejs.channel.send`, use
 >
 > ```js
->   cordova.channel.on('message', listenerCallback);
+> cordova.channel.on("message", listenerCallback);
 > ```
 
 ### cordova.channel.post(event, message)
 
-| Param | Type |
-| --- | --- |
-| event | `string` |
+| Param   | Type                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------- |
+| event   | `string`                                                                                    |
 | message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
 
 Raises a user-defined event on the cordova side.
 
 ### cordova.channel.send(message)
 
-| Param | Type |
-| --- | --- |
+| Param   | Type                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------- |
 | message | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
 
 Raises a 'message' event on the cordova side.
@@ -155,29 +155,29 @@ It is an alias for `cordova.channel.post('message', message);`.
 
 ### cordova.app.on(event, callback)
 
-| Param | Type |
-| --- | --- |
-| event | `string` |
+| Param    | Type       |
+| -------- | ---------- |
+| event    | `string`   |
 | callback | `function` |
 
 Registers callbacks for App events.
 Currently supports the 'pause' and 'resume' events, which are raised automatically when the app switches to the background/foreground.
 
 ```js
-cordova.app.on('pause', (pauseLock) => {
-  console.log('[node] app paused.');
+cordova.app.on("pause", (pauseLock) => {
+  console.log("[node] app paused.");
   pauseLock.release();
 });
-cordova.app.on('resume', () => {
-  console.log('[node] app resumed.');
+cordova.app.on("resume", () => {
+  console.log("[node] app resumed.");
 });
 ```
 
 The 'pause' event is raised when the application switches to the background. On iOS, the system will wait for the 'pause' event handlers to return before finally suspending the application. For the purpose of letting the iOS application know when it can safely suspend after going to the background, a `pauseLock` argument is passed to each 'pause' listener, so that `release()` can be called on it to signal that listener has finished doing all the work it needed to do. The application will only suspend after all the locks have been released (or iOS forces it to).
 
 ```js
-cordova.app.on('pause', (pauseLock) => {
-  server.close( () => {
+cordova.app.on("pause", (pauseLock) => {
+  server.close(() => {
     // App will only suspend after the server stops listening for connections and current connections are closed.
     pauseLock.release();
   });
@@ -192,9 +192,9 @@ Returns a writable path used for persistent data storage in the application. Its
 
 ### Channel callback: `function(arg)`
 
-| Name | Type |
-| --- | --- |
-| arg | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
+| Name | Type                                                                                        |
+| ---- | ------------------------------------------------------------------------------------------- |
+| arg  | any JS type that can be serialized with `JSON.stringify` and deserialized with `JSON.parse` |
 
 The messages sent through the channel can be of any type that can be correctly serialized with [`JSON.stringify`](https://www.w3schools.com/js/js_json_stringify.asp) on one side and deserialized with [`JSON.parse`](https://www.w3schools.com/js/js_json_parse.asp) on the other side, as it is what the channel does internally. This means that passing JS dates through the channel will convert them to strings and functions will be removed from their containing objects. In line with [The JSON Data Interchange Syntax Standard](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf), the channel supports sending messages that are composed of these JS types: `Boolean`, `Number`, `String`, `Object`, `Array`.
 
@@ -258,11 +258,11 @@ Then, with your editor of choice (we use VS Code in this example) create the `ma
 Add the following code to `main.js` and save the file:
 
 ```js
-const cordova = require('cordova-bridge');
+const cordova = require("cordova-bridge");
 
-cordova.channel.on('message', function (msg) {
-  console.log('[node] received:', msg);
-  cordova.channel.send('Replying to this message: ' + msg);
+cordova.channel.on("message", function (msg) {
+  console.log("[node] received:", msg);
+  cordova.channel.send("Replying to this message: " + msg);
 });
 ```
 
@@ -276,25 +276,24 @@ Append the following code at the end of the file:
 
 ```js
 function channelListener(msg) {
-    console.log('[cordova] received:' + msg);
+  console.log("[cordova] received:" + msg);
 }
 
 function startupCallback(err) {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log ('Node.js Mobile Engine Started');
-        nodejs.channel.send('Hello from Cordova!');
-    }
-};
+  if (err) {
+    console.log(err);
+  } else {
+    console.log("Node.js Mobile Engine Started");
+    nodejs.channel.send("Hello from Cordova!");
+  }
+}
 
 function startNodeProject() {
-    nodejs.channel.setListener(channelListener);
-    nodejs.start('main.js', startupCallback);
-    // To disable the stdout/stderr redirection to the Android logcat:
-    // nodejs.start('main.js', startupCallback, { redirectOutputToLogcat: false });
-};
-
+  nodejs.channel.setListener(channelListener);
+  nodejs.start("main.js", startupCallback);
+  // To disable the stdout/stderr redirection to the Android logcat:
+  // nodejs.start('main.js', startupCallback, { redirectOutputToLogcat: false });
+}
 ```
 
 Search for the `onDeviceReady` event and in the event handler add a call to `startNodeProject()`:
@@ -384,7 +383,7 @@ The plugin automatically detects native modules in `./www/nodejs-project/` by se
 
 Building native modules for Android can take a long time, since it depends on building a standalone NDK toolchain for each required architecture. The resulting `.node` binaries are then included in the final application in a separate asset path for each architecture and the correct one will be chosen at runtime.
 
-While the plugin tries to detect automatically the presence of native modules, there's a way to override this detection and turn the native modules build process on or off, by creating the `www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt` file and setting its contents to `1` or `0` respectively.  E.g., from the root path of your project:
+While the plugin tries to detect automatically the presence of native modules, there's a way to override this detection and turn the native modules build process on or off, by creating the `www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt` file and setting its contents to `1` or `0` respectively. E.g., from the root path of your project:
 
 ```sh
 echo "1" > www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
