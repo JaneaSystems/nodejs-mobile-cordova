@@ -1,14 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended",
-    ":dependencyDashboardApproval",
+    "config:base",
     ":timezone(Asia/Tokyo)"
   ],
   "includeForks": true,
   "rangeStrategy": "pin",
   "major": {
-    "dependencyDashboardApproval": true
+    "automerge": false
   },
   "nodenv": {
     "enabled": true,
