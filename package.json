@@ -1,6 +1,6 @@
 {
   "name": "@red-mobile/nodejs-mobile-cordova",
-  "version": "2.1.0",
+  "version": "2.0.0",
   "description": "Node.js for Mobile Apps Cordova plugin",
   "cordova": {
     "id": "@red-mobile/nodejs-mobile-cordova",
@@ -9,7 +9,11 @@
     ]
   },
   "scripts": {
-    "test:android": "cd testapp && npm i && cordova prepare android && cordova build"
+    "build:node": "node zipLibNode.js",
+    "test:clean": "rimraf testapp/node_modules testapp/plugins testapp/platforms testapp/temp-module-copy",
+    "test:install": "cd testapp && npm i",
+    "test:android": "cd testapp && cordova platform add android && cordova prepare android && cordova build",
+    "test:build": "run-s test:clean test:install test:android"
   },
   "keywords": [
     "cordova",
@@ -39,7 +43,14 @@
     "cordovaDependencies": {
       "2.0.0": {
         "cordova-android": ">=12.0.0"
+      },
+      "3.0.0": {
+        "cordova-android": ">=12.0.0"
       }
     }
+  },
+  "devDependencies": {
+    "npm-run-all2": "^6.1.1",
+    "rimraf": "^5.0.5"
   }
 }

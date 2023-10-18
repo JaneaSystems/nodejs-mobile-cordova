@@ -27,7 +27,6 @@ android {
     }
 
     packagingOptions {
-        pickFirst 'lib/x86/libnode.so'
         pickFirst 'lib/armeabi-v7a/libnode.so'
         pickFirst 'lib/arm64-v8a/libnode.so'
         pickFirst 'lib/x86_64/libnode.so'
@@ -140,12 +139,6 @@ cdvPluginPostBuildExtras += { ->
                     temp_v8_arch = "${temp_arch}"
                     temp_suffix = "${temp_arch}-linux-androideabi"
                     temp_toolchain_name = "${temp_suffix}"
-                    break
-                case 'x86':
-                    temp_dest_cpu = 'ia32'
-                    temp_v8_arch = 'ia32'
-                    temp_suffix = 'i686-linux-android'
-                    temp_toolchain_name = "${temp_arch}"
                     break
                 case 'x86_64':
                     temp_dest_cpu = 'x64'

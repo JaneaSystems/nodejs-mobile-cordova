@@ -2,6 +2,8 @@
 .eslintignore
 .eslintrc.yml
 .jshinrc
+.node-version
+.editorconfig
 
 # Git
 .git
@@ -14,3 +16,5 @@
 # test
 tests/
 testapp/
+
+zipLibNode.js

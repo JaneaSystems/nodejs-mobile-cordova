@@ -5,3 +5,4 @@ node_modules/
 www/nodejs-project/
 temp-module-copy/
 .DS_Store
+package-lock.json

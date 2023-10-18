@@ -481,7 +481,7 @@ public class NodeJS extends CordovaPlugin {
       Log.d(LOGTAG, "Copying node project assets enumerating the APK assets folder");
       copyFolder(PROJECT_ROOT);
     }
-    
+
     // Copy Custom Node Modules
     copyCustomNodeModules();
 
