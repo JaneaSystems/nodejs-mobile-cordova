@@ -50,7 +50,7 @@
     }
   },
   "devDependencies": {
-    "npm-run-all2": "^6.1.1",
-    "rimraf": "^5.0.5"
+    "npm-run-all2": "6.1.1",
+    "rimraf": "5.0.5"
   }
 }

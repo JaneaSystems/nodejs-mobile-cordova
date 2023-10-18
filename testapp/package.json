@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@red-mobile/nodejs-mobile-cordova": "file:temp-module-copy",
-    "cordova-android": "^12.0.1",
+    "cordova-android": "12.0.1",
     "nodejs-mobile-cordova-tests": "file:temp-module-copy/tests"
   }
 }
