@@ -1,31 +1,34 @@
-const zlib = require("zlib");
-const fs = require("fs");
+import * as zlib from "zlib";
+import * as fs from "fs";
 
-const libFolderPath = "./libs/android/libnode/bin/";
-const path_armv7 = libFolderPath + "armeabi-v7a/";
-const path_arm64 = libFolderPath + "arm64-v8a/";
-const path_x64 = libFolderPath + "x86_64/";
-const lib_name = "libnode.so";
-const lib_name_gz = lib_name + ".gz";
+const LIB_FOLDER_PATH = "./libs/android/libnode/bin/";
+const LIB_NAME = "libnode.so";
+const LIB_NAME_GZ = `${LIB_NAME}.gz`;
 
-function zip(libFolderPath, callback) {
-  const input_filename = libFolderPath + lib_name;
-  const output_filename = libFolderPath + lib_name_gz;
-  if (fs.existsSync(input_filename)) {
-    const input = fs.createReadStream(input_filename);
-    const output = fs.createWriteStream(output_filename);
+const paths = [
+  `${LIB_FOLDER_PATH}armeabi-v7a/`,
+  `${LIB_FOLDER_PATH}arm64-v8a/`,
+  `${LIB_FOLDER_PATH}x86_64/`,
+];
+
+function compressLib(libFolderPath) {
+  const inputFilename = `${libFolderPath}${LIB_NAME}`;
+  const outputFilename = `${libFolderPath}${LIB_NAME_GZ}`;
+
+  if (fs.existsSync(inputFilename)) {
+    const input = fs.createReadStream(inputFilename);
+    const output = fs.createWriteStream(outputFilename);
 
     const gzip = zlib.createGzip();
+
     input
       .pipe(gzip)
       .pipe(output)
-      .on("close", function () {
-        console.log(`done => ${output_filename}`);
-        fs.rmSync(input_filename);
+      .on("close", () => {
+        console.log(`done => ${outputFilename}`);
+        fs.rmSync(inputFilename);
       });
   }
 }
 
-zip(path_armv7);
-zip(path_arm64);
-zip(path_x64);
+paths.forEach(compressLib);
