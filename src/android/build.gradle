@@ -4,16 +4,12 @@ buildscript {
     }
 }
 
-def _nodeMinSdkVersion = ((rootProject?.ext?.properties?.minSdkVersion) ?: 24)
-def _compileNativeModulesSdkVersion = _nodeMinSdkVersion;
-if (_compileNativeModulesSdkVersion<24) {
-    // 24 is the minimum sdk version Node is built with.
-    _compileNativeModulesSdkVersion=24;
-}
+def _nodeMinSdkVersion = 24
+ext.cdvMinSdkVersion = _nodeMinSdkVersion
+def _compileNativeModulesSdkVersion=_nodeMinSdkVersion;
 
 android {
     defaultConfig {
-        minSdkVersion _nodeMinSdkVersion
         externalNativeBuild {
             cmake {
                 cppFlags ""
@@ -178,7 +174,7 @@ cdvPluginPostBuildExtras += { ->
 
             String ndk_bundle_path = android.ndkDirectory
             String toolchain_path = "${ndk_bundle_path}/toolchains/llvm/prebuilt/${temp_host_tag}"
-            String npm_toolchain_ar = "${toolchain_path}/bin/${temp_binutils_prefix}-ar"
+            String npm_toolchain_ar = "${toolchain_path}/bin/llvm-ar"
             String npm_toolchain_cc = "${toolchain_path}/bin/${temp_compiler_prefix}-clang"
             String npm_toolchain_cxx = "${toolchain_path}/bin/${temp_compiler_prefix}-clang++"
             String npm_toolchain_link = "${toolchain_path}/bin/${temp_compiler_prefix}-clang++"
