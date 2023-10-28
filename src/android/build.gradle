@@ -223,7 +223,7 @@ cdvPluginPostBuildExtras += { ->
             task "BuildNpmModules${abi_name}" (type:Exec) {
                 dependsOn "CopyNodeProjectAssets${abi_name}"
                 inputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/copy.timestamp"
-                outputs.file "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
+                outputs.dir "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
                 description = "Building native modules for ${abi_name}."
                 workingDir "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
                 commandLine npmCommandName, '--verbose', 'rebuild', '--build-from-source'
@@ -273,7 +273,7 @@ cdvPluginPostBuildExtras += { ->
             task "GenerateNodeNativeAssetsLists${abi_name}" {
                 dependsOn "CopyBuiltNpmAssets${abi_name}"
                 description "Generates a list for runtime copying"
-                inputs.file "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/"
+                inputs.dir "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/"
                 outputs.file "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list"
                 outputs.file "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list"
                 doLast{
