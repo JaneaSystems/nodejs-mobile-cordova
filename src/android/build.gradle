@@ -132,6 +132,7 @@ cdvPluginPostBuildExtras += { ->
             String temp_v8_arch;
             String temp_binutils_prefix;
             String temp_compiler_prefix;
+            String cargo_build_target;
             switch ( temp_arch )
             {
                 case 'arm':
@@ -139,18 +140,21 @@ cdvPluginPostBuildExtras += { ->
                     temp_v8_arch = "${temp_arch}"
                     temp_binutils_prefix = "arm-linux-androideabi"
                     temp_compiler_prefix = "armv7a-linux-androideabi${_compileNativeModulesSdkVersion}"
+                    cargo_build_target = 'arm-linux-androideabi'
                     break
                 case 'x86_64':
                     temp_dest_cpu = 'x64'
                     temp_v8_arch = 'x64'
                     temp_binutils_prefix = "x86_64-linux-android"
                     temp_compiler_prefix = "x86_64-linux-android${_compileNativeModulesSdkVersion}"
+                    cargo_build_target = "x86_64-linux-android"
                     break
                 case 'arm64':
                     temp_dest_cpu = "${temp_arch}"
                     temp_v8_arch = "${temp_arch}"
                     temp_binutils_prefix = "aarch64-linux-android"
                     temp_compiler_prefix = "aarch64-linux-android${_compileNativeModulesSdkVersion}"
+                    cargo_build_target = "aarch64-linux-android"
                     break
                 default:
                     throw new GradleException("Unsupported architecture for nodejs-mobile native modules: ${temp_arch}")
@@ -172,6 +176,7 @@ cdvPluginPostBuildExtras += { ->
             String npm_toolchain_cc = "${toolchain_path}/bin/${temp_compiler_prefix}-clang"
             String npm_toolchain_cxx = "${toolchain_path}/bin/${temp_compiler_prefix}-clang++"
             String npm_toolchain_link = "${toolchain_path}/bin/${temp_compiler_prefix}-clang++"
+            String cargo_target_triple = cargo_build_target.toUpperCase().replaceAll('-', '_')
 
             String npm_gyp_defines = "target_arch=${temp_arch}"
             npm_gyp_defines += " v8_target_arch=${temp_v8_arch}"
@@ -243,6 +248,10 @@ cdvPluginPostBuildExtras += { ->
                 if(file(original_project_bin).exists()) {
                     environment ('PATH', "${original_project_bin}" + System.getProperty("path.separator") + "${System.env.PATH}")
                 }
+
+                environment ('CARGO_BUILD_TARGET', "${cargo_build_target}")
+                environment ("CARGO_TARGET_${cargo_target_triple}_AR", "${npm_toolchain_ar}")
+                environment ("CARGO_TARGET_${cargo_target_triple}_LINKER", "${npm_toolchain_link}")
 
                 environment ('TOOLCHAIN',"${toolchain_path}")
                 environment ('AR',"${npm_toolchain_ar}")
