@@ -231,12 +231,7 @@ cdvPluginPostBuildExtras += { ->
                 description = "Building native modules for ${abi_name}."
                 workingDir "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
 
-                String npm_gyp_path_to_use; // Check common paths for nodejs-mobile-gyp
-                if ( file("${project.projectDir}/../../nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
-                  npm_gyp_path_to_use = "${project.projectDir}/../../nodejs-mobile-gyp/bin/node-gyp.js";
-                } else {
-                  npm_gyp_path_to_use = "${project.projectDir}/../node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
-                }
+                String npm_gyp_path_to_use = "${workingDir}/node_modules/nodejs-mobile-gyp/bin/node-gyp.js"
 
                 environment ('npm_config_node_engine', 'v8' )
                 environment ('npm_config_nodedir', "${project.projectDir}/libs/cdvnodejsmobile/libnode/" )
