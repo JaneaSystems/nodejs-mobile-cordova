@@ -28,6 +28,29 @@ function patchPackageJSON_preNodeGyp_modulePath(filePath) {
   }
 }
 
+/**
+ * Since npm 7+, the environment variable npm_config_node_gyp (which we rely on
+ * in scripts/ios-build-native-modules.sh) has not been forwarded to package
+ * scripts, so here we patch each module's package.json to replace
+ * node-gyp-build with our fork, node-gyp-build-mobile. This fork reads a
+ * different environment variable, originally created in
+ * scripts/ios-build-native-modules.sh, pointing to node-mobile-gyp.
+ */
+function patchPackageJSONNodeGypBuild(packageJSONPath) {
+  try {
+    const packageJSON = JSON.parse(fs.readFileSync(packageJSONPath));
+    if (packageJSON?.scripts?.install?.includes("node-gyp-build")) {
+      packageJSON.scripts.install = packageJSON.scripts.install.replace(
+        /node-gyp-build(?!-)/g,
+        "$PROJECT_DIR/../node_modules/.bin/node-gyp-build-mobile"
+      );
+      fs.writeFileSync(packageJSONPath, JSON.stringify(packageJSON, null, 2));
+    }
+  } catch (error) {
+    console.error(`Failed to patch ${packageJSONPath}:`, error);
+  }
+}
+
 // Visits every package.json to apply patches.
 function visitPackageJSON(folderPath) {
   let files = fs.readdirSync(folderPath);
@@ -39,6 +62,7 @@ function visitPackageJSON(folderPath) {
     } else if (name === "package.json") {
       try {
         patchPackageJSON_preNodeGyp_modulePath(filePath);
+        patchPackageJSONNodeGypBuild(filePath);
       } catch (e) {
         console.warn(
           'Failed to patch the file : "' +
