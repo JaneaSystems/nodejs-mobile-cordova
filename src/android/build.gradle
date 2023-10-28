@@ -274,20 +274,35 @@ cdvPluginPostBuildExtras += { ->
                     }
                     delete "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list"
                     delete "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list"
+
+                    ArrayList<String> file_list_arr = new ArrayList<String>();
+                    ArrayList<String> dir_list_arr = new ArrayList<String>();
                     String file_list = "";
                     String dir_list = "";
 
                     def assets_tree = fileTree(dir: "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/" )
                     assets_tree.visit { assetFile ->
                         if (assetFile.isDirectory()) {
-                        dir_list+="${assetFile.relativePath}\n"
+                          dir_list_arr.add("${assetFile.relativePath}\n");
                         } else {
-                        file_list+="${assetFile.relativePath}\n"
+                          file_list_arr.add("${assetFile.relativePath}\n");
                         }
                     }
+
+                    //Ensure both files are ordered similarly across builds.
+                    Collections.sort(file_list_arr);
+                    Collections.sort(dir_list_arr);
+
                     def file_list_path = new File( "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/file.list")
+                    for (String file : file_list_arr){
+                      file_list += file;
+                    }
                     file_list_path.write file_list
+
                     def dir_list_path = new File( "${rootProject.buildDir}/nodejs-native-assets/nodejs-native-assets-${abi_name}/dir.list")
+                    for (String dir : dir_list_arr){
+                      dir_list += dir;
+                    }
                     dir_list_path.write dir_list
                 }
             }
