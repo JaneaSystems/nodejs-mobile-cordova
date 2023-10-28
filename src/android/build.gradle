@@ -9,6 +9,7 @@ ext.cdvMinSdkVersion = _nodeMinSdkVersion
 def _compileNativeModulesSdkVersion=_nodeMinSdkVersion;
 
 android {
+    ndkVersion "24.0.8215888"
     defaultConfig {
         externalNativeBuild {
             cmake {
