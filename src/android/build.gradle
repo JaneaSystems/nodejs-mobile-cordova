@@ -231,16 +231,38 @@ cdvPluginPostBuildExtras += { ->
                 description = "Building native modules for ${abi_name}."
                 workingDir "${rootProject.buildDir}/nodejs-native-assets-temp-build/nodejs-native-assets-${abi_name}/nodejs-project/"
 
-                String npm_gyp_path_to_use = "${workingDir}/node_modules/nodejs-mobile-gyp/bin/node-gyp.js"
+                String npm_gyp_path_to_use;
+
+                new ByteArrayOutputStream().withStream { outputStream ->
+                    def commandResult = exec {
+                        commandLine 'node', '-e', "console.log(require.resolve(\"nodejs-mobile-gyp\"))"
+                        ignoreExitValue = true
+                        standardOutput = outputStream
+                    }
+                    npm_gyp_path_to_use = outputStream.toString().trim();
+                }
+
+                if(npm_gyp_path_to_use && file(npm_gyp_path_to_use).exists() ) {
+                    // We resolved likely to the lib file, we want the bin file.
+                    npm_gyp_path_to_use = "${file(npm_gyp_path_to_use).getParentFile().getParentFile().toString()}/bin/node-gyp.js";
+                } else if( file ("${workingDir}/node_modules/nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
+                    npm_gyp_path_to_use = "${workingDir}/node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
+                } else if( file("${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js").exists() ) {
+                    npm_gyp_path_to_use = "${rootProject.projectDir}/../../plugins/nodejs-mobile-cordova/node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
+                } else {
+                    npm_gyp_path_to_use = "${rootProject.projectDir}/../../node_modules/nodejs-mobile-gyp/bin/node-gyp.js";
+                }
+
+                logger.warn("npm_gyp_path_to_use: ${npm_gyp_path_to_use}");
 
                 environment ('npm_config_node_engine', 'v8' )
                 environment ('npm_config_nodedir', "${project.projectDir}/libs/cdvnodejsmobile/libnode/" )
-                environment ('npm_config_node_gyp', npm_gyp_path_to_use)
+                environment ('npm_config_node_gyp', "${npm_gyp_path_to_use}")
                 environment ('npm_config_arch', temp_arch)
                 environment ('npm_config_platform', 'android')
                 environment ('npm_config_format', 'make-android')
                 environment ('PROJECT_DIR', "${rootProject.projectDir}")
-                environment ('NODEJS_MOBILE_GYP', npm_gyp_path_to_use)
+                environment ('NODEJS_MOBILE_GYP', "${npm_gyp_path_to_use}")
 
                 // Adds the original project .bin to the path. It's a workaround
                 // to correctly build some modules that depend on symlinked modules,
