@@ -10,6 +10,7 @@
 
 - Cordova 12.x or higher
 - Android API 24 or higher
+- iOS 11 or higher
 
 When building an application for the Android platform, make sure you have the [Android NDK](https://developer.android.com/ndk/index.html) installed and the environment variable `ANDROID_NDK_HOME` set, for example:
 
@@ -20,6 +21,7 @@ When building an application for the Android platform, make sure you have the [A
 ## Supported Platforms
 
 - Android (ARMv7a, ARM64)
+- iOS (arm64)
 
 ## Reporting Issues
 

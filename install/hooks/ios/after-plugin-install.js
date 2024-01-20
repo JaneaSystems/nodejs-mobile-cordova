@@ -7,7 +7,7 @@ module.exports = function(context) {
   // Require the iOS platform Api to get the Xcode .pbxproj path.
   var iosPlatformPath = path.join(context.opts.projectRoot, 'platforms', 'ios');
   var iosAPI = require(path.join(iosPlatformPath, 'cordova', 'Api'));
-  var iosAPIInstance = new iosAPI();
+  var iosAPIInstance = new iosAPI('ios', iosPlatformPath);
   var pbxprojPath = iosAPIInstance.locations.pbxproj;
 
   // Read the Xcode project and get the target.
@@ -19,6 +19,15 @@ module.exports = function(context) {
   var rebuildNativeModulesBuildPhaseName = 'Build Node.js Mobile Native Modules';
   var rebuildNativeModulesBuildPhaseScript = `
 set -e
+
+# On M1 macs homebrew is located outside /usr/local/bin
+if [[ ! $PATH =~ /opt/homebrew/bin: ]]; then
+  PATH="/opt/homebrew/bin/:/opt/homebrew/sbin:$PATH"
+fi
+# Xcode executes script build phases in independant shell environment.
+# Force load users configuration file
+[ -f "$ZDOTDIR"/.zshrc ] && source "$ZDOTDIR"/.zshrc
+
 if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
 # If build native modules preference is not set, look for it in the project's
 # www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
@@ -66,13 +75,27 @@ NODEJS_HEADERS_DIR="$( cd "$( dirname "$PRODUCT_SETTINGS_PATH" )" && cd Plugins/
 if [ -d "$PROJECT_DIR/../../www/nodejs-project/node_modules/.bin/" ]; then
   PATH="$PROJECT_DIR/../../www/nodejs-project/node_modules/.bin/:$PATH"
 fi
+
 pushd $CODESIGNING_FOLDER_PATH/www/nodejs-project/
-if [ "$PLATFORM_NAME" == "iphoneos" ]
-then
-GYP_DEFINES="OS=ios" npm_config_nodedir="$NODEJS_HEADERS_DIR" npm_config_node_gyp="$NODEJS_MOBILE_GYP_BIN_FILE" npm_config_platform="ios" npm_config_format="make-ios" npm_config_node_engine="chakracore" npm_config_arch="arm64" npm --verbose rebuild --build-from-source
+export GYP_DEFINES="OS=ios"
+export npm_config_nodedir="$NODEJS_HEADERS_DIR"
+export npm_config_node_gyp="$NODEJS_MOBILE_GYP_BIN_FILE"
+export npm_config_format="make-ios"
+export npm_config_node_engine="chakracore"
+export NODEJS_MOBILE_GYP="$NODEJS_MOBILE_GYP_BIN_FILE"
+export npm_config_platform="ios"
+
+if [[ "$PLATFORM_NAME" == "iphoneos" ]]; then
+  export npm_config_arch="arm64"
 else
-GYP_DEFINES="OS=ios" npm_config_nodedir="$NODEJS_HEADERS_DIR" npm_config_node_gyp="$NODEJS_MOBILE_GYP_BIN_FILE" npm_config_platform="ios" npm_config_format="make-ios" npm_config_node_engine="chakracore" npm_config_arch="x64" npm --verbose rebuild --build-from-source
+  if [[ "$HOST_ARCH" == "arm64" ]] ; then # M1 mac
+    export GYP_DEFINES="OS=ios iossim=true"
+    export npm_config_arch="arm64"
+  else
+    export npm_config_arch="x64"
+  fi
 fi
+npm --verbose rebuild --build-from-source
 popd
 `
   var rebuildNativeModulesBuildPhase = xcodeProject.buildPhaseObject('PBXShellScriptBuildPhase', rebuildNativeModulesBuildPhaseName, firstTargetUUID);
@@ -82,7 +105,7 @@ popd
       'PBXShellScriptBuildPhase',
       rebuildNativeModulesBuildPhaseName,
       firstTargetUUID,
-      { shellPath: '/bin/sh', shellScript: rebuildNativeModulesBuildPhaseScript }
+      { shellPath: '/bin/zsh', shellScript: rebuildNativeModulesBuildPhaseScript }
     );
   }
 
@@ -90,6 +113,15 @@ popd
   var signNativeModulesBuildPhaseName = 'Sign Node.js Mobile Native Modules';
   var signNativeModulesBuildPhaseScript = `
 set -e
+
+# On M1 macs homebrew is located outside /usr/local/bin
+if [[ ! $PATH =~ /opt/homebrew/bin: ]]; then
+  PATH="/opt/homebrew/bin/:/opt/homebrew/sbin:$PATH"
+fi
+# Xcode executes script build phases in independant shell environment.
+# Force load users configuration file
+[ -f "$ZDOTDIR"/.zshrc ] && source "$ZDOTDIR"/.zshrc
+
 if [ -z "$NODEJS_MOBILE_BUILD_NATIVE_MODULES" ]; then
 # If build native modules preference is not set, look for it in the project's
 # www/NODEJS_MOBILE_BUILD_NATIVE_MODULES_VALUE.txt
@@ -143,7 +175,7 @@ find "$CODESIGNING_FOLDER_PATH/www/nodejs-project/" -name "*.framework" -type d 
       'PBXShellScriptBuildPhase',
       signNativeModulesBuildPhaseName,
       firstTargetUUID,
-      { shellPath: '/bin/sh', shellScript: signNativeModulesBuildPhaseScript }
+      { shellPath: '/bin/zsh', shellScript: signNativeModulesBuildPhaseScript }
     );
   }
 

@@ -41,7 +41,7 @@ module.exports = function(context) {
   // Require the iOS platform Api to get the Xcode .pbxproj path.
   var iosPlatformPath = path.join(context.opts.projectRoot, 'platforms', 'ios');
   var iosAPI = require(path.join(iosPlatformPath, 'cordova', 'Api'));
-  var iosAPIInstance = new iosAPI();
+  var iosAPIInstance = new iosAPI('ios', iosPlatformPath);
   var pbxprojPath = iosAPIInstance.locations.pbxproj;
 
   // Read the Xcode project and get the target.
